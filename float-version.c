@@ -1,7 +1,11 @@
 #include <stdio.h>
+#include <string.h>
 #include <float.h>
 
-//float jpegMatrix [];
+const int IMAGE_HEIGHT = 240;
+const int IMAGE_WIDTH = 320;
+int IMAGE_SIZE = 240*320;
+float jpegMatrix [240*320];
 
 void getImage(char *imageName){
     fflush(stdout);
@@ -25,18 +29,22 @@ void getImage(char *imageName){
     }
     
     printf("\nBody\n");
-    for(int i = 0; i < 250; i++){
-        for(int j = 0; j < 8; j++){
-            if((cbinary = fgetc(imageFile)) != EOF){
-                printf("%d ", cbinary);
-            }
+    for(int i = 0; i < IMAGE_SIZE; i++){
+        if((cbinary = fgetc(imageFile)) == EOF){
+            break;
         }
-        printf("\n");
+        else{
+            jpegMatrix[i] = cbinary;
+            printf("%d ", cbinary);
+        }
     }
 
-    // while((cbinary = fgetc(imageFile)) != EOF){
-    //     printf("%d ", cbinary);
-    // }
+    printf("Array first value: %f\n", jpegMatrix[0]);
+    printf("Array last value: %f\n", jpegMatrix[IMAGE_SIZE-1]);
+
+    while((cbinary = fgetc(imageFile)) != EOF){
+        printf("%d ", cbinary);
+    }
 }
 
 int main(int argc, char *argv[]){
