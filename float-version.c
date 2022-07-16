@@ -10,22 +10,25 @@ float jpegMatrix [240*320];
 void getImage(char *imageName){
     fflush(stdout);
     printf("Filename: %s\n", imageName);
+    
     FILE *imageFile = fopen(imageName, "rb");
-    printf("File read\n");
+    if (imageFile == NULL) {
+        perror("Error: Could not open file");
+    }
 
     int cbinary;
+    int error;
 
-    //Read file header
-    // printf("Header\n");
-    for(int i = 0; i < 54; i++){
-        cbinary = fgetc(imageFile);
-        // printf("%d ", cbinary);
+    //Move to end of file header
+    error = fseek(imageFile, 54, SEEK_SET);
+    if (error != 0) {
+        perror("Error: Could not seek past header of file");
     }
-    //Read Colour table
-    // printf("\nColour table\n");
-    for(int i = 0; i < 128*8; i++){
-        cbinary = fgetc(imageFile);
-        // printf("%d ", cbinary);
+    
+    //Move to end of Colour table
+    error = fseek(imageFile, 1024, SEEK_CUR);
+    if (error != 0) {
+        perror("Error: Could not seek past colour table of file");
     }
     
     printf("\nBody\n");
