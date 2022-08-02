@@ -117,6 +117,7 @@ int main(int argc, char *argv[]){
 
     printf("\n\n----TESTING AREA----\n\n");
 
+    // Loeffler's testing
     float I[8] = { 5, 8, 3, 1, 6, 2, 9, 1 };
 
     loefflers(I);
@@ -126,6 +127,7 @@ int main(int argc, char *argv[]){
     }
     printf("\n\n");
 
+    // Transpose testing
     float *testMatrix;
 
     float A[N][M] = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}};
@@ -159,6 +161,7 @@ int main(int argc, char *argv[]){
         printf("\n");
     }
 
+    // Old tests
     /*
     float I1 = 1;
     float I2 = 2;
