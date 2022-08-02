@@ -83,29 +83,40 @@ float scaleUp(float I){
 
 void * loefflers(float * x){
     
+    float A[8];
+    
     //stage 1
-    reflector(x[0], x[7], &x[0], &x[7]);
-    reflector(x[1], x[6], &x[1], &x[6]);
-    reflector(x[2], x[5], &x[2], &x[5]);
-    reflector(x[3], x[4], &x[3], &x[4]);
+    reflector(x[0], x[7], &A[0], &A[7]);
+    reflector(x[1], x[6], &A[1], &A[6]);
+    reflector(x[2], x[5], &A[2], &A[5]);
+    reflector(x[3], x[4], &A[3], &A[4]);
     
     //stage 2
-    reflector(x[0], x[3], &x[0], &x[3]);
-    reflector(x[1], x[2], &x[1], &x[2]);
+    reflector(A[0], A[3], &A[0], &A[3]);
+    reflector(A[1], A[2], &A[1], &A[2]);
     
-    rotator(x[4], x[7], 1, 3, &x[4], &x[7]);
-    rotator(x[5], x[6], 1, 1, &x[5], &x[6]);
+    rotator(A[4], A[7], 1, 3, &A[4], &A[7]);
+    rotator(A[5], A[6], 1, 1, &A[5], &A[6]);
     
     //stage 3
-    reflector(x[0], x[1], &x[0], &x[1]);
-    rotator(x[2], x[3], sqrt(2), 6, &x[2], &x[3]);
-    reflector(x[4], x[6], &x[4], &x[6]);
-    reflector(x[7], x[5], &x[7], &x[5]);
+    reflector(A[0], A[1], &A[0], &A[1]);
+    rotator(A[2], A[3], sqrt(2), 6, &A[2], &A[3]);
+    reflector(A[4], A[6], &A[4], &A[6]);
+    reflector(A[7], A[5], &A[7], &A[5]);
     
     //stage 4
-    reflector(x[7], x[4], &x[7], &x[4]);
-    x[5] = scaleUp(x[5]);
-    x[6] = scaleUp(x[6]);
+    reflector(A[7], A[4], &A[7], &A[4]);
+    A[5] = scaleUp(A[5]);
+    A[6] = scaleUp(A[6]);
+    
+    x[0] = A[0];
+    x[1] = A[4];
+    x[2] = A[2];
+    x[3] = A[6];
+    x[4] = A[7];
+    x[5] = A[3];
+    x[6] = A[5];
+    x[7] = A[1];
 }
 
 int main(int argc, char *argv[]){
@@ -261,7 +272,32 @@ int main(int argc, char *argv[]){
             printf("%f ", current_group_t[i][j]);
         }
         printf("\n");
-    }			
-
+    }
+    
+    for(int x = 0; x < 40; x++){
+    	for(int y = 0; y < 30; y++){
+    		getNextGroup(8*x, 8*y);
+    		
+    		for(int i = 0; i < 8; i++){
+    			loefflers(current_group[i]);
+    		}
+    		
+    		float current_group_t[8][8];
+    		transpose(current_group, current_group_t);
+    		
+    		for(int i = 0; i < 8; i++){
+    			loefflers(current_group_t[i]);
+    		}
+    		
+    		for (int i = 0; i < 8; i++) {
+        		for (int j = 0; j < 8; j++) {
+            			printf("%f ", current_group_t[i][j]);
+        		}
+        		printf("\n");
+    		}
+    		printf("\n");
+    	}
+    }
+    			
     return 0;
 }
