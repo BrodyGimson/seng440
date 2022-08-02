@@ -77,6 +77,36 @@ float scaleUp(float I){
     return O;
 }
 
+void * loefflers(float * x){
+    
+    
+    
+    //stage 1
+    reflector(x[0], x[7], );
+    reflector(x[1], x[6], );
+    reflector(x[2], x[5], );
+    reflector(x[3], x[4], );
+    
+    //stage 2
+    reflector(x[0], x[3], );
+    reflector(x[1], x[2], );
+    
+    rotator(x[4], x[7], 1, 3, );
+    rotator(x[5], x[6], 1, 1, );
+    
+    //stage 3
+    reflector(x[0], x[1], );
+    rotator(x[2], x[3], sqrt(2), 6, );
+    reflector(x[4], x[6], );
+    reflector(x[7], x[5], );
+    
+    //stage 4
+    reflector(x[7], x[4], );
+    scaleUp(x[5]);
+    scaleUp(x[6]);
+    
+}
+
 int main(int argc, char *argv[]){
     
     if (argc != 2){
