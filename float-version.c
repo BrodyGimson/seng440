@@ -51,7 +51,6 @@ void getImage(char *image_name){
     }
 }
 
-
 void transpose(float A[][N], float B[][M]){
 
     for(int i = 0; i < N; i++){
@@ -68,7 +67,6 @@ void getNextGroup(int current_x, int current_y) {
         }
     }
 }
-
 
 void * reflector(float I1, float I2, float *O1, float *O2){       
     O1[0] = I1 + I2;
