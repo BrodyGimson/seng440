@@ -46,17 +46,8 @@ void getImage(char *image_name){
             }
             else{
                 pixel_matrix[i][j] = cbinary;
-                printf("%d ", cbinary);
             }
         }
-        printf("\n");
-    }
-
-    printf("Array first value: %f\n", pixel_matrix[0][0]);
-    printf("Array last value: %f\n", pixel_matrix[IMAGE_HEIGHT-1][IMAGE_WIDTH-1]);
-
-    while((cbinary = fgetc(image_file)) != EOF){
-        printf("%d ", cbinary);
     }
 }
 
@@ -130,39 +121,52 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
-    current_x = 0;
-    current_y = 0;
-
-    getImage(argv[1]);
-    getNextGroup(current_x, current_y);
-
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            printf("%f ", current_group[i][j]);
-        }
-        printf("\n");
-    }
-
-    current_y = 120;
-    current_x = 160;
-    getNextGroup(current_x, current_y);
-
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            printf("%f ", current_group[i][j]);
-        }
-        printf("\n");
-    }
-
     printf("Success\n");
 
     printf("\n\n----TESTING AREA----\n\n");
+
+    // Get image test
+    getImage(argv[1]);
+
+    printf("Get Image Test:");
+    printf("Array first value: %f\n", pixel_matrix[0][0]);
+    printf("Array last value: %f\n", pixel_matrix[IMAGE_HEIGHT-1][IMAGE_WIDTH-1]);
+
+    // Get first group test
+    printf("\nGet first group of pixels:\n");
+
+    current_x = 0;
+    current_y = 0;
+
+    getNextGroup(current_x, current_y);
+
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            printf("%f ", current_group[i][j]);
+        }
+        printf("\n");
+    }
+
+    // Get center group test
+    printf("\nGet center group of pixels:\n");
+
+    current_y = 120;
+    current_x = 160;
+
+    getNextGroup(current_x, current_y);
+
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            printf("%f ", current_group[i][j]);
+        }
+        printf("\n");
+    }
 
     // Loeffler's testing
     float I[8] = { 5, 8, 3, 1, 6, 2, 9, 1 };
 
     loefflers(I);
-    printf("Testing Loefflers with { 5, 8, 3, 1, 6, 2, 9, 1 } as input\n");
+    printf("\nTesting Loefflers with { 5, 8, 3, 1, 6, 2, 9, 1 } as input\n");
     for (int i = 0; i < 8; i++) {
         printf("%f, ", I[i]);
     }
