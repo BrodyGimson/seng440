@@ -6,6 +6,7 @@ const int IMAGE_HEIGHT = 240;
 const int IMAGE_WIDTH = 320;
 int IMAGE_SIZE = 240*320;
 float pixel_matrix[240][320];
+float current_group[8][8];
 
 void getImage(char *image_name){
     FILE *image_file;
@@ -54,14 +55,46 @@ void getImage(char *image_name){
     }
 }
 
+void getNextGroup(int current_x, int current_y) {
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            current_group[i][j] = pixel_matrix[current_y + i][current_x + j];
+        }
+    }
+}
+
 int main(int argc, char *argv[]){
+    int current_x;
+    int current_y;
     
     if (argc != 2){
         printf("Error: 1 arg expected {filename}, received: %d\n", (argc-1));
         return 1;
     }
 
+    current_x = 0;
+    current_y = 0;
+
     getImage(argv[1]);
+    getNextGroup(current_x, current_y);
+
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            printf("%f ", current_group[i][j]);
+        }
+        printf("\n");
+    }
+
+    current_y = 120;
+    current_x = 160;
+    getNextGroup(current_x, current_y);
+
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            printf("%f ", current_group[i][j]);
+        }
+        printf("\n");
+    }
 
     printf("Success\n");
 
