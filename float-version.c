@@ -19,7 +19,6 @@ void getImage(char *image_name){
     int error;
 
     fflush(stdout);
-    printf("Filename: %s\n", image_name);
     
     image_file = fopen(image_name, "rb");
     if (image_file == NULL) {
@@ -38,7 +37,6 @@ void getImage(char *image_name){
         perror("Error: Could not seek past colour table of file");
     }
     
-    printf("\nBody\n");
     for(int i = 0; i < IMAGE_HEIGHT; i++){
         for(int j = 0; j < IMAGE_WIDTH; j++) {
             if((cbinary = fgetc(image_file)) == EOF){
@@ -46,25 +44,15 @@ void getImage(char *image_name){
             }
             else{
                 pixel_matrix[i][j] = cbinary;
-                printf("%d ", cbinary);
             }
         }
-        printf("\n");
-    }
-
-    printf("Array first value: %f\n", pixel_matrix[0][0]);
-    printf("Array last value: %f\n", pixel_matrix[IMAGE_HEIGHT-1][IMAGE_WIDTH-1]);
-
-    while((cbinary = fgetc(image_file)) != EOF){
-        printf("%d ", cbinary);
     }
 }
 
+void transpose(float A[][8], float B[][8]){
 
-void transpose(float A[][N], float B[][M]){
-
-    for(int i = 0; i < N; i++){
-        for(int j = 0; j < M; j++){
+    for(int i = 0; i < 8; i++){
+        for(int j = 0; j < 8; j++){
             B[i][j] = A[j][i];
         }
     }
@@ -78,20 +66,57 @@ void getNextGroup(int current_x, int current_y) {
     }
 }
 
-void * reflector(float I1, float I2, float *O){
-        
-    O[0] = I1 + I2;
-    O[1] = I1 - I2;
+void * reflector(float I1, float I2, float *O1, float *O2){       
+    O1[0] = I1 + I2;
+    O2[0] = I1 - I2;
 }
 
-void rotator(float I1, float I2, float k, float Cn, float *O){
-    O[0] = ((k * sin((Cn * M_PI)/16)) - (k * cos((Cn * M_PI)/16)))*I2 + (k * cos((Cn * M_PI)/16)*(I1 + I2));
-    O[1] = -((k * sin((Cn * M_PI)/16)) + (k * cos((Cn * M_PI)/16)))*I1 + (k * cos((Cn * M_PI)/16)*(I1 + I2));
+void rotator(float I1, float I2, float k, float Cn, float *O1, float *O2){
+    O1[0] = ((k * sin((Cn * M_PI)/16)) - (k * cos((Cn * M_PI)/16)))*I2 + (k * cos((Cn * M_PI)/16)*(I1 + I2));
+    O2[0] = -((k * sin((Cn * M_PI)/16)) + (k * cos((Cn * M_PI)/16)))*I1 + (k * cos((Cn * M_PI)/16)*(I1 + I2));
 }
 
 float scaleUp(float I){
     float O = sqrt(2) * I;
     return O;
+}
+
+void * loefflers(float * x){
+    
+    float A[8];
+    
+    //stage 1
+    reflector(x[0], x[7], &A[0], &A[7]);
+    reflector(x[1], x[6], &A[1], &A[6]);
+    reflector(x[2], x[5], &A[2], &A[5]);
+    reflector(x[3], x[4], &A[3], &A[4]);
+    
+    //stage 2
+    reflector(A[0], A[3], &A[0], &A[3]);
+    reflector(A[1], A[2], &A[1], &A[2]);
+    
+    rotator(A[4], A[7], 1, 3, &A[4], &A[7]);
+    rotator(A[5], A[6], 1, 1, &A[5], &A[6]);
+    
+    //stage 3
+    reflector(A[0], A[1], &A[0], &A[1]);
+    rotator(A[2], A[3], sqrt(2), 6, &A[2], &A[3]);
+    reflector(A[4], A[6], &A[4], &A[6]);
+    reflector(A[7], A[5], &A[7], &A[5]);
+    
+    //stage 4
+    reflector(A[7], A[4], &A[7], &A[4]);
+    A[5] = scaleUp(A[5]);
+    A[6] = scaleUp(A[6]);
+    
+    x[0] = A[0];
+    x[1] = A[4];
+    x[2] = A[2];
+    x[3] = A[6];
+    x[4] = A[7];
+    x[5] = A[3];
+    x[6] = A[5];
+    x[7] = A[1];
 }
 
 int main(int argc, char *argv[]){
@@ -103,38 +128,74 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
-    current_x = 0;
-    current_y = 0;
-
-    getImage(argv[1]);
-    getNextGroup(current_x, current_y);
-
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            printf("%f ", current_group[i][j]);
-        }
-        printf("\n");
-    }
-
-    current_y = 120;
-    current_x = 160;
-    getNextGroup(current_x, current_y);
-
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            printf("%f ", current_group[i][j]);
-        }
-        printf("\n");
-    }
+    printf("Filename: %s\n", argv[1]);
 
     printf("Success\n");
 
     printf("\n\n----TESTING AREA----\n\n");
 
+    // Get image test
+    getImage(argv[1]);
+
+    printf("Get Image Test:\n");
+    printf("Array first value: %f\n", pixel_matrix[0][0]);
+    printf("Array last value: %f\n", pixel_matrix[IMAGE_HEIGHT-1][IMAGE_WIDTH-1]);
+
+    // Get first group test
+    printf("\nGet first group of pixels:\n");
+
+    current_x = 0;
+    current_y = 0;
+
+    getNextGroup(current_x, current_y);
+
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            printf("%f ", current_group[i][j]);
+        }
+        printf("\n");
+    }
+
+    // Get center group test
+    printf("\nGet center group of pixels:\n");
+
+    current_y = 120;
+    current_x = 160;
+
+    getNextGroup(current_x, current_y);
+
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            printf("%f ", current_group[i][j]);
+        }
+        printf("\n");
+    }
+
+    // Loeffler's testing
+    float I[8] = { 21, 21, 21, 21, 21, 21, 21, 21 };
+
+    loefflers(I);
+    printf("\nTesting Loefflers with { 5, 8, 3, 1, 6, 2, 9, 1 } as input\n");
+    for (int i = 0; i < 8; i++) {
+        printf("%f, ", I[i]);
+    }
+    printf("\n\n");
+
+    /*
+    // Transpose testing
     float *testMatrix;
 
     float A[N][M] = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}};
     float B[M][N];
+
+    printf("Transpose test on \n");
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < M; j++){
+            printf("%f ", A[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\nTranspose\n");
 
     transpose(A, B);
 
@@ -145,20 +206,98 @@ int main(int argc, char *argv[]){
         printf("\n");
     }
 
+    printf("\nTranspose back\n");
+    transpose(B, A);
+
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < M; j++){
+            printf("%f ", A[i][j]);
+        }
+        printf("\n");
+    }
+    */
+
+    // Loeffler Function Tests
     float I1 = 1;
     float I2 = 2;
 	
     float O[2];	
 
-    reflector(I1, I2, O);
+    printf("\nReflector Test\n");
+    reflector(I1, I2, &O[0], &O[1]);
     printf("I1: %f, I2: %f\n", I1, I2);
     printf("O1: %f, O2: %f\n", O[0], O[1]);
     
-    rotator(I1, I2, 1, 1, O);
+    printf("\nRotator Test\n");
+    rotator(I1, I2, 1, 1, &O[0], &O[1]);
     printf("I1: %f, I2: %f\n", I1, I2);
     printf("O1: %f, O2: %f\n", O[0], O[1]);
     
-    printf("I1: %f, O: %f\n", I1, scaleUp(I1));	
+    printf("\nScale Up Test\n");
+    printf("I1: %f, O: %f\n", I1, scaleUp(I1));
+    
+    printf("\nLoefflers 8x8\n");
+    getNextGroup(120, 160);
+    for(int i = 0; i < 8; i++){
+    	loefflers(current_group[i]);
+    }
+    
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            printf("%f ", current_group[i][j]);
+        }
+        printf("\n");
+    }			
 
+    printf("\n");
+    
+    float current_group_t[8][8];
+    transpose(current_group, current_group_t);
+    printf("Transpose\n");
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            printf("%f ", current_group_t[i][j]);
+        }
+        printf("\n");
+    }
+    
+    printf("\n");	
+    
+    for(int i = 0; i < 8; i++){
+    	loefflers(current_group_t[i]);
+    }
+    
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            printf("%f ", current_group_t[i][j]);
+        }
+        printf("\n");
+    }
+    
+    for(int x = 0; x < 40; x++){
+    	for(int y = 0; y < 30; y++){
+    		getNextGroup(8*x, 8*y);
+    		
+    		for(int i = 0; i < 8; i++){
+    			loefflers(current_group[i]);
+    		}
+    		
+    		float current_group_t[8][8];
+    		transpose(current_group, current_group_t);
+    		
+    		for(int i = 0; i < 8; i++){
+    			loefflers(current_group_t[i]);
+    		}
+    		
+    		for (int i = 0; i < 8; i++) {
+        		for (int j = 0; j < 8; j++) {
+            			printf("%f ", current_group_t[i][j]);
+        		}
+        		printf("\n");
+    		}
+    		printf("\n");
+    	}
+    }
+    			
     return 0;
 }
