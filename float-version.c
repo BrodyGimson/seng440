@@ -1,9 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <float.h>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
-const int IMAGE_HEIGHT = 240;
-const int IMAGE_WIDTH = 320;
+#define IMAGE_HEIGHT 240
+#define IMAGE_WIDTH 320
+#define N 3
+#define M 3
+
 int IMAGE_SIZE = 240*320;
 float pixel_matrix[240][320];
 float current_group[8][8];
@@ -55,12 +60,38 @@ void getImage(char *image_name){
     }
 }
 
+
+void transpose(float A[][N], float B[][M]){
+
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < M; j++){
+            B[i][j] = A[j][i];
+        }
+    }
+}
+
 void getNextGroup(int current_x, int current_y) {
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             current_group[i][j] = pixel_matrix[current_y + i][current_x + j];
         }
     }
+}
+
+void * reflector(float I1, float I2, float *O){
+        
+    O[0] = I1 + I2;
+    O[1] = I1 - I2;
+}
+
+void rotator(float I1, float I2, float k, float Cn, float *O){
+    O[0] = ((k * sin((Cn * M_PI)/16)) - (k * cos((Cn * M_PI)/16)))*I2 + (k * cos((Cn * M_PI)/16)*(I1 + I2));
+    O[1] = -((k * sin((Cn * M_PI)/16)) + (k * cos((Cn * M_PI)/16)))*I1 + (k * cos((Cn * M_PI)/16)*(I1 + I2));
+}
+
+float scaleUp(float I){
+    float O = sqrt(2) * I;
+    return O;
 }
 
 int main(int argc, char *argv[]){
@@ -97,6 +128,37 @@ int main(int argc, char *argv[]){
     }
 
     printf("Success\n");
+
+    printf("\n\n----TESTING AREA----\n\n");
+
+    float *testMatrix;
+
+    float A[N][M] = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}};
+    float B[M][N];
+
+    transpose(A, B);
+
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < M; j++){
+            printf("%f ", B[i][j]);
+        }
+        printf("\n");
+    }
+
+    float I1 = 1;
+    float I2 = 2;
+	
+    float O[2];	
+
+    reflector(I1, I2, O);
+    printf("I1: %f, I2: %f\n", I1, I2);
+    printf("O1: %f, O2: %f\n", O[0], O[1]);
+    
+    rotator(I1, I2, 1, 1, O);
+    printf("I1: %f, I2: %f\n", I1, I2);
+    printf("O1: %f, O2: %f\n", O[0], O[1]);
+    
+    printf("I1: %f, O: %f\n", I1, scaleUp(I1));	
 
     return 0;
 }
