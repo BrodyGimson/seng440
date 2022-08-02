@@ -61,19 +61,20 @@ void transpose(float A[][N], float B[][M]){
     }
 }
 
-void reflector(float I1, float I2, float O1, float O2){
-    O1 = I1 + I2;
-    O2 = I1 - I2;
-    printf("O1: %f, O2: %f\n", O1, O2);
+void * reflector(float I1, float I2, float *O){
+        
+    O[0] = I1 + I2;
+    O[1] = I1 - I2;
 }
 
-void rotator(float I1, float I2, float k, float Cn, float O1, float O2){
-    O1 = ((k * sin((Cn * M_PI)/16)) - (k * cos((Cn * M_PI)/16)))*I2 + (k * cos((Cn * M_PI)/16)*(I1 + I2));
-    O2 = -((k * sin((Cn * M_PI)/16)) + (k * cos((Cn * M_PI)/16)))*I1 + (k * cos((Cn * M_PI)/16)*(I1 + I2));
+void rotator(float I1, float I2, float k, float Cn, float *O){
+    O[0] = ((k * sin((Cn * M_PI)/16)) - (k * cos((Cn * M_PI)/16)))*I2 + (k * cos((Cn * M_PI)/16)*(I1 + I2));
+    O[1] = -((k * sin((Cn * M_PI)/16)) + (k * cos((Cn * M_PI)/16)))*I1 + (k * cos((Cn * M_PI)/16)*(I1 + I2));
 }
 
-void scaleUp(float I, float O){
-    O = sqrt(2) * I;
+float scaleUp(float I){
+    float O = sqrt(2) * I;
+    return O;
 }
 
 int main(int argc, char *argv[]){
@@ -98,18 +99,25 @@ int main(int argc, char *argv[]){
 
     for(int i = 0; i < N; i++){
         for(int j = 0; j < M; j++){
-            printf("%d ", B[i][j]);
+            printf("%f ", B[i][j]);
         }
         printf("\n");
     }
 
-    // float I1 = 1;
-    // float I2 = 2;
-    // float O1, O2;
+    float I1 = 1;
+    float I2 = 2;
+	
+    float O[2];	
 
-    // reflector(I1, I2, O1, O2);
-    // printf("I1: %f, I2: %f\n", I1, I2);
-    // printf("O1: %f, O2: %f\n", O1, O2);
+    reflector(I1, I2, O);
+    printf("I1: %f, I2: %f\n", I1, I2);
+    printf("O1: %f, O2: %f\n", O[0], O[1]);
+    
+    rotator(I1, I2, 1, 1, O);
+    printf("I1: %f, I2: %f\n", I1, I2);
+    printf("O1: %f, O2: %f\n", O[0], O[1]);
+    
+    printf("I1: %f, O: %f\n", I1, scaleUp(I1));	
 
     return 0;
 }
