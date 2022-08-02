@@ -19,7 +19,6 @@ void getImage(char *image_name){
     int error;
 
     fflush(stdout);
-    printf("Filename: %s\n", image_name);
     
     image_file = fopen(image_name, "rb");
     if (image_file == NULL) {
@@ -38,7 +37,6 @@ void getImage(char *image_name){
         perror("Error: Could not seek past colour table of file");
     }
     
-    printf("\nBody\n");
     for(int i = 0; i < IMAGE_HEIGHT; i++){
         for(int j = 0; j < IMAGE_WIDTH; j++) {
             if((cbinary = fgetc(image_file)) == EOF){
@@ -119,6 +117,8 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
+    printf("Filename: %s\n", argv[1]);
+
     printf("Success\n");
 
     printf("\n\n----TESTING AREA----\n\n");
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]){
     // Get image test
     getImage(argv[1]);
 
-    printf("Get Image Test:");
+    printf("Get Image Test:\n");
     printf("Array first value: %f\n", pixel_matrix[0][0]);
     printf("Array last value: %f\n", pixel_matrix[IMAGE_HEIGHT-1][IMAGE_WIDTH-1]);
 
