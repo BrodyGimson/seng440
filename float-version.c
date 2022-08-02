@@ -61,15 +61,15 @@ void transpose(float A[][N], float B[][M]){
     }
 }
 
-void * reflector(float I1, float I2, float *O){
+void * reflector(float I1, float I2, float *O1, float *O2){
         
-    O[0] = I1 + I2;
-    O[1] = I1 - I2;
+    O1[0] = I1 + I2;
+    O2[0] = I1 - I2;
 }
 
-void rotator(float I1, float I2, float k, float Cn, float *O){
-    O[0] = ((k * sin((Cn * M_PI)/16)) - (k * cos((Cn * M_PI)/16)))*I2 + (k * cos((Cn * M_PI)/16)*(I1 + I2));
-    O[1] = -((k * sin((Cn * M_PI)/16)) + (k * cos((Cn * M_PI)/16)))*I1 + (k * cos((Cn * M_PI)/16)*(I1 + I2));
+void rotator(float I1, float I2, float k, float Cn, float *O1, float *O2){
+    O1[0] = ((k * sin((Cn * M_PI)/16)) - (k * cos((Cn * M_PI)/16)))*I2 + (k * cos((Cn * M_PI)/16)*(I1 + I2));
+    O2[0] = -((k * sin((Cn * M_PI)/16)) + (k * cos((Cn * M_PI)/16)))*I1 + (k * cos((Cn * M_PI)/16)*(I1 + I2));
 }
 
 float scaleUp(float I){
@@ -79,32 +79,29 @@ float scaleUp(float I){
 
 void * loefflers(float * x){
     
-    
-    
     //stage 1
-    reflector(x[0], x[7], );
-    reflector(x[1], x[6], );
-    reflector(x[2], x[5], );
-    reflector(x[3], x[4], );
+    reflector(x[0], x[7], &x[0], &x[7]);
+    reflector(x[1], x[6], &x[1], &x[6]);
+    reflector(x[2], x[5], &x[2], &x[5]);
+    reflector(x[3], x[4], &x[3], &x[4]);
     
     //stage 2
-    reflector(x[0], x[3], );
-    reflector(x[1], x[2], );
+    reflector(x[0], x[3], &x[0], &x[3]);
+    reflector(x[1], x[2], &x[1], &x[2]);
     
-    rotator(x[4], x[7], 1, 3, );
-    rotator(x[5], x[6], 1, 1, );
+    rotator(x[4], x[7], 1, 3, &x[4], &x[7]);
+    rotator(x[5], x[6], 1, 1, &x[5], &x[6]);
     
     //stage 3
-    reflector(x[0], x[1], );
-    rotator(x[2], x[3], sqrt(2), 6, );
-    reflector(x[4], x[6], );
-    reflector(x[7], x[5], );
+    reflector(x[0], x[1], &x[0], &x[1]);
+    rotator(x[2], x[3], sqrt(2), 6, &x[2], &x[3]);
+    reflector(x[4], x[6], &x[4], &x[6]);
+    reflector(x[7], x[5], &x[7], &x[5]);
     
     //stage 4
-    reflector(x[7], x[4], );
-    scaleUp(x[5]);
-    scaleUp(x[6]);
-    
+    reflector(x[7], x[4], &x[7], &x[4]);
+    x[5] = scaleUp(x[5]);
+    x[6] = scaleUp(x[6]);
 }
 
 int main(int argc, char *argv[]){
@@ -120,10 +117,28 @@ int main(int argc, char *argv[]){
 
     printf("\n\n----TESTING AREA----\n\n");
 
+    float I[8] = { 5, 8, 3, 1, 6, 2, 9, 1 };
+
+    loefflers(I);
+    printf("Testing Loefflers with { 5, 8, 3, 1, 6, 2, 9, 1 } as input\n");
+    for (int i = 0; i < 8; i++) {
+        printf("%f, ", I[i]);
+    }
+    printf("\n\n");
+
     float *testMatrix;
 
     float A[N][M] = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}};
     float B[M][N];
+
+    printf("Transpose test on \n");
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < M; j++){
+            printf("%f ", A[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\nTranspose\n");
 
     transpose(A, B);
 
@@ -134,6 +149,17 @@ int main(int argc, char *argv[]){
         printf("\n");
     }
 
+    printf("\nTranspose back\n");
+    transpose(B, A);
+
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < M; j++){
+            printf("%f ", A[i][j]);
+        }
+        printf("\n");
+    }
+
+    /*
     float I1 = 1;
     float I2 = 2;
 	
@@ -147,7 +173,8 @@ int main(int argc, char *argv[]){
     printf("I1: %f, I2: %f\n", I1, I2);
     printf("O1: %f, O2: %f\n", O[0], O[1]);
     
-    printf("I1: %f, O: %f\n", I1, scaleUp(I1));	
+    printf("I1: %f, O: %f\n", I1, scaleUp(I1));
+    */
 
     return 0;
 }
