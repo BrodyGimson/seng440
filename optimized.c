@@ -199,17 +199,19 @@ int main(int argc, char *argv[])
 
     		get_next_group(pos_x, pos_y, current_group);
     		
-    		for (int i = 0; i < 8; ++i)
+    		for (int i = 7; i != 0; i--)
             {
     			loefflers(current_group[i]);
-    		}	
+    		}
+            loefflers(current_group[0]);	
     		
     		transpose(current_group, current_group_trans);
     		
-    		for (int i = 0; i < 8; ++i)
+    		for (int i = 7; i != 0; i--)
             {
     			loefflers(current_group_trans[i]);
     		}
+            loefflers(current_group_trans[0]);
 
     		for (int i = 0; i < 8; ++i) 
             {
