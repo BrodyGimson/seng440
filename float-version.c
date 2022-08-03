@@ -90,11 +90,7 @@ void * loefflers(float * x){
     reflector(x[1], x[6], &A[1], &A[6]);
     reflector(x[2], x[5], &A[2], &A[5]);
     reflector(x[3], x[4], &A[3], &A[4]);
-    printf("stage 1\n");
-    for (int i = 0; i < 8; i++) {
-        printf("%f, ", A[i]);
-    }
-    printf("\n\n");
+
     
     //stage 2
     reflector(A[0], A[3], &A[0], &A[3]);
@@ -102,32 +98,20 @@ void * loefflers(float * x){
     
     rotator(A[4], A[7], 1, 3, &A[4], &A[7]);
     rotator(A[5], A[6], 1, 1, &A[5], &A[6]);
-    printf("stage 2\n");
-    for (int i = 0; i < 8; i++) {
-        printf("%f, ", A[i]);
-    }
-    printf("\n\n");
+
     
     //stage 3
     reflector(A[0], A[1], &A[0], &A[1]);
     rotator(A[2], A[3], sqrt(2), 6, &A[2], &A[3]);
     reflector(A[4], A[6], &A[4], &A[6]);
     reflector(A[7], A[5], &A[7], &A[5]);
-    printf("stage 3\n");
-    for (int i = 0; i < 8; i++) {
-        printf("%f, ", A[i]);
-    }
-    printf("\n\n");
+
     
     //stage 4
     reflector(A[7], A[4], &A[7], &A[4]);
     A[5] = scaleUp(A[5]);
     A[6] = scaleUp(A[6]);
-    printf("stage 4\n");
-    for (int i = 0; i < 8; i++) {
-        printf("%f, ", A[i]);
-    }
-    printf("\n\n");
+
     
     x[0] = A[0];
     x[4] = A[1];
@@ -255,7 +239,7 @@ int main(int argc, char *argv[]){
     
     printf("\nScale Up Test\n");
     printf("I1: %f, O: %f\n", I1, scaleUp(I1));
-    
+    */
     printf("\nLoefflers 8x8\n");
     getNextGroup(120, 160);
     for(int i = 0; i < 8; i++){
@@ -309,15 +293,16 @@ int main(int argc, char *argv[]){
     			loefflers(current_group_t[i]);
     		}
     		
+    		transpose(current_group_t, current_group);
     		for (int i = 0; i < 8; i++) {
         		for (int j = 0; j < 8; j++) {
-            			printf("%f ", current_group_t[i][j]);
+            			printf("%f ", current_group[i][j]);
         		}
         		printf("\n");
     		}
     		printf("\n");
     	}
     }
-    */			
+    			
     return 0;
 }
