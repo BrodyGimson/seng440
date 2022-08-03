@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
     
     if (argc != 2)
     {
-        printf("Error: 1 arg expected {filename}, received: %d\n", (argc-1));
+        printf("Error: 1 arg expected {filename}, received: %d\n", (argc - 1));
         return 1;
     }
 
