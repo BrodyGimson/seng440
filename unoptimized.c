@@ -34,7 +34,7 @@ int32_t g_current_group[8][8];
 
 void getImage(char *p_image_name) 
 {
-    // Barr-C: Pointers should start with "_p" (7.1.k)
+    // Barr-C: Pointers should start with "p_" (7.1.k)
     // Barr-C: variables initialized before use (7.2.a)
     FILE *p_image_file;
     int cbinary;
