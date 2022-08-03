@@ -23,7 +23,6 @@ int const IMAGE_WIDTH = 320;
 int const SQRT2 = 181;
 int const ROTATE_CONST_p_output_1[3] = {-12873, -4520, 12539};      // Constants used for output 1 in rotators
 int const ROTATE_CONST_p_output_2[3] = {-19266, -22725, -30273};    // Constants used for output 2 in rotators
-//int const ROTATE_CONST[3] = {16069, 13622, 8866};                 // Constants used for both in rotators
 int const END_SCALE = 16384;                                        // Ending scale factor
 
 // Barr-C: Global variables should start with "g_" (7.1.j)
