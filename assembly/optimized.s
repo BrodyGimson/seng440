@@ -50,43 +50,42 @@ get_next_group:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	@ link register save eliminated.
-	stmfd	sp!, {r4, r5, r6, r7}
-	mov	r5, r0
-	mov	r4, r1
-	ldr	r1, .L15
+	stmfd	sp!, {r4, r5, r6, r7, r8}
+	mov	r6, r0
+	mov	r5, r1
+	mov	r4, r2
 	mov	r0, #0
-	ldr	r7, .L15+4
-	ldr	r6, .L15+8
+	ldr	r8, .L15
+	mov	r7, r0
 	b	.L9
 .L10:
 	ldr	r3, [ip], #4
-	str	r3, [r2], #4
-	cmp	r1, r2
+	str	r3, [r1, r2]
+	add	r2, r2, #4
+	cmp	r2, #32
 	bne	.L10
 	add	r0, r0, #1
-	add	r1, r1, #32
+	add	r4, r4, #32
 	cmp	r0, #8
 	beq	.L14
 .L9:
-	add	r3, r0, r4
-	mov	r2, r3, asl #6
-	mov	r3, r3, asl #8
-	add	r2, r2, r3
-	add	r2, r2, r5
-	mov	r2, r2, asl #2
-	add	ip, r7, r2
-	mov	r3, r0, asl #5
-	add	r2, r6, r3
+	mov	r1, r4
+	add	r2, r0, r5
+	mov	r3, r2, asl #6
+	mov	r2, r2, asl #8
+	add	r3, r3, r2
+	add	r3, r3, r6
+	mov	r3, r3, asl #2
+	add	ip, r8, r3
+	mov	r2, r7
 	b	.L10
 .L14:
-	ldmfd	sp!, {r4, r5, r6, r7}
+	ldmfd	sp!, {r4, r5, r6, r7, r8}
 	bx	lr
 .L16:
 	.align	2
 .L15:
-	.word	g_current_group+32
 	.word	g_pixel_matrix
-	.word	g_current_group
 	.size	get_next_group, .-get_next_group
 	.align	2
 	.global	reflector
@@ -354,10 +353,10 @@ get_image:
 	.global	main
 	.type	main, %function
 main:
-	@ args = 0, pretend = 0, frame = 272
+	@ args = 0, pretend = 0, frame = 528
 	@ frame_needed = 0, uses_anonymous_args = 0
 	stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
-	sub	sp, sp, #276
+	sub	sp, sp, #532
 	mov	r3, r0
 	cmp	r0, #2
 	beq	.L41
@@ -375,40 +374,41 @@ main:
 	bl	puts
 	ldr	r0, [r4, #0]
 	bl	get_image
-	mov	r5, #0
-	ldr	r8, .L64+12
-	ldr	r9, .L64+16
-	add	r3, r8, #32
-	ldr	fp, .L64+20
-	add	sl, sp, #16
+	mov	r6, #0
+	add	r5, sp, #272
+	ldr	fp, .L64+12
+	mov	sl, r5
+	add	r9, sp, #16
+	add	r3, sp, #304
 	str	r3, [sp, #8]
-	str	r5, [sp, #4]
+	str	r6, [sp, #4]
 	b	.L43
 .L48:
-	mov	r6, r7
+	mov	r7, r8
 	ldr	r0, [sp, #12]
-	mov	r1, r7
+	mov	r1, r8
+	mov	r2, sl
 	bl	get_next_group
-	mov	r4, r8
+	mov	r4, sl
 .L44:
 	mov	r0, r4
 	bl	loefflers
 	add	r4, r4, #32
-	cmp	r4, r9
+	add	r3, sp, #528
+	cmp	r4, r3
 	bne	.L44
-	mov	r0, r8
-	mov	r1, sl
+	mov	r0, sl
+	mov	r1, r9
 	bl	transpose
-	mov	r4, sl
+	mov	r4, r9
 .L45:
 	mov	r0, r4
 	bl	loefflers
 	add	r4, r4, #32
-	add	r3, sp, #272
-	cmp	r4, r3
+	cmp	r4, r5
 	bne	.L45
-	mov	r0, sl
-	mov	r1, r8
+	mov	r0, r9
+	mov	r1, sl
 	bl	transpose
 	ldr	r0, [sp, #8]
 	ldr	ip, [sp, #4]
@@ -422,20 +422,20 @@ main:
 	add	r0, r0, #32
 	cmp	ip, #8
 	bne	.L46
-	add	r7, r7, #8
-	cmp	r7, #240
+	add	r8, r8, #8
+	cmp	r8, #240
 	bne	.L48
-	add	r5, r5, #8
-	cmp	r5, #320
+	add	r6, r6, #8
+	cmp	r6, #320
 	bne	.L43
-	ldr	r0, .L64+24
+	ldr	r0, .L64+16
 	bl	puts
-	sub	r5, r5, #320
-	ldr	sl, .L64+20
+	mov	r5, #0
+	ldr	sl, .L64+12
 	mov	r9, r5
-	ldr	fp, .L64+28
+	ldr	fp, .L64+20
 	mov	r7, #0
-	ldr	r8, .L64+32
+	ldr	r8, .L64+24
 	b	.L49
 .L50:
 	ldr	r0, [r6], #4
@@ -455,14 +455,14 @@ main:
 	add	r5, r5, #1
 	cmp	r5, #8
 	bne	.L49
-	ldr	r0, .L64+36
+	ldr	r0, .L64+28
 	bl	puts
-	ldr	r6, .L64+40
+	ldr	r6, .L64+32
 	add	r5, r5, #112
-	ldr	sl, .L64+20
-	ldr	r9, .L64+28
+	ldr	sl, .L64+12
+	ldr	r9, .L64+20
 	mov	r7, #0
-	ldr	r8, .L64+32
+	ldr	r8, .L64+24
 	mov	fp, #10
 	b	.L51
 .L52:
@@ -485,7 +485,7 @@ main:
 	bne	.L51
 	mov	r0, #0
 .L42:
-	add	sp, sp, #276
+	add	sp, sp, #532
 	ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
 .L51:
 	mov	r3, r5, asl #8
@@ -503,18 +503,18 @@ main:
 	b	.L50
 .L46:
 	mov	r3, ip, asl #5
-	add	r1, r8, r3
-	add	r2, ip, r5
+	add	r1, r5, r3
+	add	r2, ip, r6
 	mov	r3, r2, asl #6
 	mov	r2, r2, asl #8
 	add	r3, r3, r2
-	add	r3, r3, r6
+	add	r3, r3, r7
 	mov	r3, r3, asl #2
 	add	r2, fp, r3
 	b	.L47
 .L43:
-	str	r5, [sp, #12]
-	mov	r7, #0
+	str	r6, [sp, #12]
+	mov	r8, #0
 	b	.L48
 .L65:
 	.align	2
@@ -522,8 +522,6 @@ main:
 	.word	.LC4
 	.word	.LC5
 	.word	.LC6
-	.word	g_current_group
-	.word	g_current_group+256
 	.word	g_output_matrix
 	.word	.LC7
 	.word	.LC8
@@ -541,7 +539,6 @@ main:
 	.global	END_SCALE
 	.comm	g_pixel_matrix,307200,4
 	.comm	g_output_matrix,307200,4
-	.comm	g_current_group,256,4
 	.section	.rodata
 	.align	2
 .LANCHOR0 = . + 0
