@@ -2,7 +2,6 @@
 #include <string.h>
 #include <float.h>
 #include <stdint.h>
-#include <time.h>
 
 /*
 General Barr-C things that were followed included 
@@ -170,8 +169,6 @@ void * loefflers(int32_t * x)
 int main(int argc, char *argv[])
 {
     int32_t current_group_trans[8][8];
-    clock_t start_ticks;
-    clock_t end_ticks;
     
     if (argc != 2)
     {
@@ -184,8 +181,6 @@ int main(int argc, char *argv[])
     printf("\n----TESTING AREA----\n");
 
     get_image(argv[1]);
-    
-    start_ticks = clock();
 
     for (int x = 0; x < 40; x++)
     {
@@ -217,8 +212,6 @@ int main(int argc, char *argv[])
     	}
     }
 
-    end_ticks = clock();
-
     printf("\nCorner 8x8:\n");
     for (int i = 0; i < 8; i++) 
     {
@@ -238,8 +231,6 @@ int main(int argc, char *argv[])
         }
         printf("\n");
     }
-
-    printf("\nClock Ticks for full file: %ld\n", end_ticks - start_ticks);
     			
     return 0;
 }
