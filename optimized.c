@@ -130,20 +130,11 @@ void loefflers(int32_t * x)
 {
     int32_t tmp_output[8];
     
-    int32_t local_x0 = x[0];
-    int32_t local_x1 = x[1];
-    int32_t local_x2 = x[2];
-    int32_t local_x3 = x[3];
-    int32_t local_x4 = x[4];
-    int32_t local_x5 = x[5];
-    int32_t local_x6 = x[6];
-    int32_t local_x7 = x[7];
-    
     //stage 1
-    reflector(local_x0, local_x7, &tmp_output[0], &tmp_output[7]);
-    reflector(local_x1, local_x6, &tmp_output[1], &tmp_output[6]);
-    reflector(local_x2, local_x5, &tmp_output[2], &tmp_output[5]);
-    reflector(local_x3, local_x4, &tmp_output[3], &tmp_output[4]);
+    reflector(x[0], x[7], &tmp_output[0], &tmp_output[7]);
+    reflector(x[1], x[6], &tmp_output[1], &tmp_output[6]);
+    reflector(x[2], x[5], &tmp_output[2], &tmp_output[5]);
+    reflector(x[3], x[4], &tmp_output[3], &tmp_output[4]);
     
     // Even Numbers
     //stage 2
