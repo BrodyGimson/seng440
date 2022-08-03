@@ -92,176 +92,134 @@ get_next_group:
 	.global	loefflers
 	.type	loefflers, %function
 loefflers:
-	@ args = 0, pretend = 0, frame = 32
+	@ args = 0, pretend = 0, frame = 48
 	@ frame_needed = 0, uses_anonymous_args = 0
-	@ link register save eliminated.
-	stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp}
-	sub	sp, sp, #32
-	ldr	r6, [r0, #0]
-	str	r0, [sp, #0]
-	mov	r3, r0
-	ldr	r2, [r3, #4]!
-	str	r3, [sp, #0]
-	str	r2, [sp, #24]
-	str	r0, [sp, #4]
-	mov	r5, r0
-	ldr	r9, [r5, #8]!
-	str	r5, [sp, #4]
+	stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+	sub	sp, sp, #60
+	mov	r4, r0
 	str	r0, [sp, #8]
-	mov	r2, r0
-	ldr	r8, [r2, #12]!
+	add	r9, sp, #24
+	ldr	r0, [r0, #0]
+	mov	r2, r4
+	ldr	r1, [r2, #28]!
 	str	r2, [sp, #8]
-	str	r0, [sp, #12]
-	mov	r3, r0
-	ldr	sl, [r3, #16]!
+	mov	r2, r9
+	add	r3, sp, #52
+	bl	reflector
+	str	r4, [sp, #12]
+	mov	fp, r4
+	add	sl, sp, #28
+	mov	r3, r4
+	ldr	r0, [r3, #4]!
 	str	r3, [sp, #12]
-	str	r0, [sp, #16]
-	mov	r2, r0
-	ldr	r5, [r2, #20]!
-	str	r2, [sp, #16]
-	mov	fp, r0
 	ldr	r1, [fp, #24]!
-	str	r0, [sp, #20]
-	mov	r3, r0
-	ldr	r2, [r3, #28]!
+	mov	r2, sl
+	add	r3, sp, #48
+	bl	reflector
+	mov	r8, r4
+	str	r4, [sp, #16]
+	add	r7, sp, #32
+	ldr	r0, [r8, #8]!
+	mov	r2, r4
+	ldr	r1, [r2, #20]!
+	str	r2, [sp, #16]
+	mov	r2, r7
+	add	r3, sp, #44
+	bl	reflector
+	str	r4, [sp, #20]
+	mov	r6, r4
+	add	r5, sp, #36
+	mov	r3, r4
+	ldr	r0, [r3, #12]!
 	str	r3, [sp, #20]
-	add	ip, r2, r6
+	ldr	r1, [r6, #16]!
+	mov	r2, r5
+	add	r3, sp, #40
+	bl	reflector
+	ldr	r0, [sp, #24]
+	ldr	r1, [sp, #36]
+	mov	r2, r9
+	mov	r3, r5
+	bl	reflector
+	ldr	r0, [sp, #28]
+	ldr	r1, [sp, #32]
+	mov	r2, sl
+	mov	r3, r7
+	bl	reflector
+	ldr	r0, [sp, #24]
+	ldr	r1, [sp, #28]
+	mov	r2, r9
+	mov	r3, sl
+	bl	reflector
+	str	r5, [sp, #0]
+	ldr	r0, [sp, #32]
+	ldr	r1, [sp, #36]
+	mov	r2, #2
+	mov	r3, r7
+	bl	rotator
 	ldr	r3, [sp, #24]
-	add	r4, r1, r3
-	add	r7, r5, r9
-	add	r3, sl, r8
-	rsb	r8, sl, r8
-	rsb	r9, r5, r9
-	ldr	r5, [sp, #24]
-	rsb	r1, r1, r5
-	str	r1, [sp, #28]
-	rsb	r6, r2, r6
-	add	r5, r3, ip
-	rsb	ip, r3, ip
-	add	sl, r7, r4
-	rsb	r4, r7, r4
-	add	r2, r4, ip
-	mov	r3, r2, asl #4
-	mov	r1, r2, asl #7
-	add	r3, r3, r1
-	rsb	r3, r2, r3
-	mov	r1, r3, asl #5
-	rsb	r1, r3, r1
-	mov	r1, r1, asl #1
-	mov	r3, ip, asl #9
-	sub	r3, r3, ip, asl #6
-	mov	r2, r3, asl #3
-	rsb	r2, r3, r2
-	rsb	r2, ip, r2
-	mov	r2, r2, asl #2
-	rsb	r2, ip, r2
-	add	r2, r1, r2
-	mov	r3, r4, asl #6
-	sub	r3, r3, r4, asl #2
-	rsb	r3, r4, r3
-	mov	r3, r3, asl #3
-	add	r3, r3, r4
-	mov	r3, r3, asl #6
-	add	r3, r3, r4
-	rsb	r1, r3, r1
-	add	r3, sl, r5
 	mov	r3, r3, asl #7
-	str	r3, [r0, #0]
-	rsb	r5, sl, r5
-	mov	r5, r5, asl #7
-	ldr	r0, [sp, #12]
-	str	r5, [r0, #0]
-	mov	r2, r2, asr #7
-	ldr	r3, [sp, #4]
-	str	r2, [r3, #0]
-	mov	r1, r1, asr #7
-	str	r1, [fp, #0]
-	add	r2, r6, r8
-	mov	ip, r2, asl #4
-	sub	ip, ip, r2, asl #2
-	add	ip, ip, r2
-	mov	ip, ip, asl #2
-	add	ip, ip, r2
-	mov	r3, ip, asl #8
-	add	ip, ip, r3
-	add	ip, ip, r2
-	mov	r4, r6, asl #7
-	sub	r4, r4, r6, asl #4
-	add	r4, r4, r6
-	mov	r3, r4, asl #2
-	add	r4, r4, r3
-	sub	r4, ip, r4, asl #3
-	mov	r2, r8, asl #2
-	mov	r3, r8, asl #4
-	add	r2, r2, r3
-	mov	r3, r2, asl #2
-	add	r2, r2, r3
-	add	r2, r2, r8
-	mov	r3, r2, asl #4
-	rsb	r3, r2, r3
-	sub	r3, r3, r3, asl #4
-	add	ip, ip, r3
-	ldr	r5, [sp, #28]
-	add	r3, r5, r9
-	mov	r1, r3, asl #8
-	sub	r1, r1, r3, asl #2
-	rsb	r1, r3, r1
-	mov	r1, r1, asl #4
-	add	r1, r1, r3
-	mov	r1, r1, asl #2
-	add	r1, r1, r3
-	mov	r3, r5, asl #2
-	mov	r2, r5, asl #5
-	add	r3, r3, r2
-	mov	r2, r3, asl #4
-	add	r3, r3, r2
-	add	r3, r3, r5
-	mov	r0, r3, asl #2
-	rsb	r0, r3, r0
-	sub	r0, r0, r0, asl #3
-	add	r0, r1, r0
-	mov	r2, r9, asl #2
-	mov	r3, r9, asl #4
-	add	r2, r2, r3
-	mov	r3, r2, asl #4
-	rsb	r3, r2, r3
-	add	r3, r3, r9
-	mov	r3, r3, asl #5
-	add	r3, r3, r9
-	sub	r1, r1, r3, asl #1
-	add	r6, r1, r4
-	add	r5, r0, ip
-	rsb	ip, r0, ip
-	mov	ip, ip, asr #7
-	rsb	r4, r1, r4
-	mov	r4, r4, asr #7
-	rsb	r3, r6, r5
+	str	r3, [r4, #0]
+	ldr	r3, [sp, #28]
+	mov	r3, r3, asl #7
+	str	r3, [r6, #0]
+	ldr	r3, [sp, #32]
 	mov	r3, r3, asr #7
-	ldr	r0, [sp, #20]
-	str	r3, [r0, #0]
-	mov	r2, ip, asl #4
-	sub	r2, r2, ip, asl #2
-	mov	r3, r2, asl #4
-	rsb	r3, r2, r3
-	add	r3, r3, ip
+	str	r3, [r8, #0]
+	ldr	r3, [sp, #36]
+	mov	r3, r3, asr #7
+	str	r3, [fp, #0]
+	add	r2, sp, #52
+	str	r2, [sp, #0]
+	ldr	r0, [sp, #40]
+	ldr	r1, [sp, #52]
+	mov	r2, #1
+	add	r3, sp, #40
+	bl	rotator
+	add	r3, sp, #48
+	str	r3, [sp, #0]
+	ldr	r0, [sp, #44]
+	ldr	r1, [sp, #48]
+	mov	r2, #0
+	add	r3, sp, #44
+	bl	rotator
+	ldr	r0, [sp, #40]
+	ldr	r1, [sp, #48]
+	add	r2, sp, #40
+	add	r3, sp, #48
+	bl	reflector
+	ldr	r0, [sp, #52]
+	ldr	r1, [sp, #44]
+	add	r2, sp, #52
+	add	r3, sp, #44
+	bl	reflector
+	ldr	r0, [sp, #52]
+	ldr	r1, [sp, #40]
+	add	r2, sp, #52
+	add	r3, sp, #40
+	bl	reflector
+	ldr	r0, [sp, #44]
+	bl	scale_up
+	str	r0, [sp, #44]
+	ldr	r0, [sp, #48]
+	bl	scale_up
+	ldr	r3, [sp, #40]
 	mov	r3, r3, asr #7
 	ldr	r2, [sp, #8]
 	str	r3, [r2, #0]
-	mov	r2, r4, asl #4
-	sub	r2, r2, r4, asl #2
-	mov	r3, r2, asl #4
-	rsb	r3, r2, r3
-	add	r3, r3, r4
+	ldr	r3, [sp, #44]
 	mov	r3, r3, asr #7
-	ldr	r0, [sp, #16]
-	str	r3, [r0, #0]
-	add	r5, r5, r6
-	mov	r5, r5, asr #7
-	ldr	r2, [sp, #0]
-	str	r5, [r2, #0]
-	add	sp, sp, #32
-	ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp}
-	bx	lr
+	ldr	r2, [sp, #20]
+	str	r3, [r2, #0]
+	mov	r0, r0, asr #7
+	ldr	r3, [sp, #16]
+	str	r0, [r3, #0]
+	ldr	r3, [sp, #52]
+	mov	r3, r3, asr #7
+	ldr	r2, [sp, #12]
+	str	r3, [r2, #0]
+	add	sp, sp, #60
+	ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
 	.size	loefflers, .-loefflers
 	.align	2
 	.global	get_image
