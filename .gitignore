@@ -1,5 +1,8 @@
 main
 float-version
+unoptimized
+optimized
+neon
 .vscode
 *.bmp
 *.exe
