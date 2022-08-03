@@ -13,6 +13,7 @@
 
 int IMAGE_SIZE = 240*320;
 int32_t pixel_matrix[240][320];
+int32_t output_matrix[240][320];
 int32_t current_group[8][8];
 int32_t rotateConstO1[3] = {-12873, -4520, 12539};
 int32_t rotateConstO2[3] = {-19266, -22725, -30273};
@@ -130,8 +131,7 @@ void * loefflers(int32_t * x){
 }
 
 int main(int argc, char *argv[]){
-    int current_x;
-    int current_y;
+    int32_t current_group_t[8][8];
     
     if (argc != 2){
         printf("Error: 1 arg expected {filename}, received: %d\n", (argc-1));
@@ -140,185 +140,19 @@ int main(int argc, char *argv[]){
 
     printf("Filename: %s\n", argv[1]);
 
-    printf("Success\n");
+    printf("\n----TESTING AREA----\n\n");
 
-    printf("\n\n----TESTING AREA----\n\n");
-
-    // Get image test
     getImage(argv[1]);
-
-    printf("Get Image Test:\n");
-    printf("Array first value: %d\n", pixel_matrix[0][0]);
-    printf("Array last value: %d\n", pixel_matrix[IMAGE_HEIGHT-1][IMAGE_WIDTH-1]);
-    /*
-    int32_t a = 1;
-    int32_t b = 2;
-    int32_t O[2];
-    reflector(a * pow(2, 7), b * pow(2, 7), &O[0], &O[1]);
-    printf("\nOutputs: %d, %d\n", O[0], O[1]);
-    
-    rotator(a * pow(2, 7), b * pow(2, 7), 1, &O[0], &O[1]);
-    printf("\nOutputs: %d, %d\n", O[0], O[1]);
-    
-    int32_t scaleO = scaleUp(b* pow(2, 7));
-    printf("\nOutputs: %d\n", scaleO);
-    
-    // Get first group test
-    printf("\nGet first group of pixels:\n");
-
-    current_x = 0;
-    current_y = 0;
-
-    getNextGroup(current_x, current_y);
-
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            printf("%f ", current_group[i][j]);
-        }
-        printf("\n");
-    }
-
-    // Get center group test
-    printf("\nGet center group of pixels:\n");
-
-    current_y = 120;
-    current_x = 160;
-
-    getNextGroup(current_x, current_y);
-
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            printf("%f ", current_group[i][j]);
-        }
-        printf("\n");
-    }
-    */
-    
-    // Loeffler's testing
-    int32_t I[8] = { 2, 1, 4, 9, 3, 8, 7, 2 };
-    float Out[8];
-    for(int i = 0; i < 8; i++){
-    	I[i] = I[i];
-    }
-
-    loefflers(I);
-    printf("\nTesting Loefflers with { 2, 1, 4, 9, 3, 8, 7, 2 } as input\n");
-    for (int i = 0; i < 8; i++) {
-    	if(i != 0 && i != 4){
-    		Out[i] = I[i]/pow(2, 14);
-    	}
-    	else{
-    		Out[i] = I[i];
-    	}
-        printf("%f, ", Out[i]);
-    }
-    printf("\n\n");
-    /*
-    
-    // Transpose testing
-    int32_t *testMatrix;
-
-    int32_t A[N][M] = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}};
-    int32_t B[M][N];
-
-    printf("Transpose test on \n");
-    for(int i = 0; i < N; i++){
-        for(int j = 0; j < M; j++){
-            printf("%f ", A[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\nTranspose\n");
-
-    transpose(A, B);
-
-    for(int i = 0; i < N; i++){
-        for(int j = 0; j < M; j++){
-            printf("%f ", B[i][j]);
-        }
-        printf("\n");
-    }
-
-    printf("\nTranspose back\n");
-    transpose(B, A);
-
-    for(int i = 0; i < N; i++){
-        for(int j = 0; j < M; j++){
-            printf("%f ", A[i][j]);
-        }
-        printf("\n");
-    }
-    
-    // Loeffler Function Tests
-    int32_t I1 = 1;
-    int32_t I2 = 2;
-	
-    int32_t O[2];	
-
-    printf("\nReflector Test\n");
-    reflector(I1, I2, &O[0], &O[1]);
-    printf("I1: %f, I2: %f\n", I1, I2);
-    printf("O1: %f, O2: %f\n", O[0], O[1]);
-    
-    printf("\nRotator Test\n");
-    rotator(I1, I2, 1, 1, &O[0], &O[1]);
-    printf("I1: %f, I2: %f\n", I1, I2);
-    printf("O1: %f, O2: %f\n", O[0], O[1]);
-    
-    printf("\nScale Up Test\n");
-    printf("I1: %f, O: %f\n", I1, scaleUp(I1));
-    */
-    
-    printf("\nLoefflers 8x8\n");
-    getNextGroup(120, 160);
-    for(int i = 0; i < 8; i++){
-    	loefflers(current_group[i]);
-    }
-    
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            printf("%d ", current_group[i][j]);
-        }
-        printf("\n");
-    }			
-
-    printf("\n");
-    
-    int32_t current_group_t[8][8];
-    transpose(current_group, current_group_t);
-    
-    printf("Transpose\n");
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            printf("%d ", current_group_t[i][j]);
-        }
-        printf("\n");
-    }
-    
-    printf("\n");	
-    
-    for(int i = 0; i < 8; i++){
-    	loefflers(current_group_t[i]);
-    }
-    
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            printf("%f ", current_group_t[i][j]/pow(2, 14));
-        }
-        printf("\n");
-    }
-    
-    
     
     for(int x = 0; x < 40; x++){
-    	for(int y = 0; y < 30; y++){
+    	
+        for(int y = 0; y < 30; y++){
     		getNextGroup(8*x, 8*y);
     		
     		for(int i = 0; i < 8; i++){
     			loefflers(current_group[i]);
-    		}
+    		}	
     		
-    		int32_t current_group_t[8][8];
     		transpose(current_group, current_group_t);
     		
     		for(int i = 0; i < 8; i++){
@@ -326,15 +160,33 @@ int main(int argc, char *argv[]){
     		}
     		
     		transpose(current_group_t, current_group);
+
     		for (int i = 0; i < 8; i++) {
+
         		for (int j = 0; j < 8; j++) {
-            			printf("%f ", current_group[i][j]/pow(2, 14));
+            			output_matrix[x*8 + i][y*8 + j] = current_group[i][j];
         		}
-        		printf("\n");
     		}
-    		printf("\n");
     	}
     }
+
+    printf("Corner 8x8:\n");
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            printf("%f, ", output_matrix[i][j] / pow(2, 14));
+        }
+        printf("\n");
+    }
+    printf("\n");
+
+    printf("Center 8x8:\n");
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            printf("%f, ", output_matrix[i + 120][j + 160] / pow(2, 14));
+        }
+        printf("\n");
+    }
+    printf("\n");
     			
     return 0;
 }
