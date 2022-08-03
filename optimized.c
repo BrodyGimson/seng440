@@ -192,8 +192,8 @@ int main(int argc, char *argv[])
     printf("\n----TESTING AREA----\n");
 
     // Loop used to run algorithm 100000 times
-    for (int c = 0; c < 10000; c++) 
-    {
+    //for (int c = 0; c < 10000; c++) 
+    //{
         get_image(argv[1]);
 
         for (int x = 0; x < 40; x++)
@@ -226,7 +226,7 @@ int main(int argc, char *argv[])
                 }
             }
         }
-    }
+    //}
 
     printf("\nCorner 8x8:\n");
     for (int i = 0; i < 8; i++) 
