@@ -4,6 +4,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <stdint.h>
+#include <float.h>
 
 #define IMAGE_HEIGHT 240
 #define IMAGE_WIDTH 320
@@ -13,9 +14,9 @@
 int IMAGE_SIZE = 240*320;
 int32_t pixel_matrix[240][320];
 int32_t current_group[8][8];
-int32_t rotateConstO1[3] = {-16328, -16215, -22689};
-int32_t rotateConstO2[3] = {-16440, -16552, -23642};
-int32_t rotateConst[3] = {16384, 16383, 23165};
+int32_t rotateConstO1[3] = {-12873, -4520, 12539};
+int32_t rotateConstO2[3] = {-19266, -22725, -30273};
+int32_t rotateConst[3] = {16069, 13622, 8866};
 int32_t sqrt2 = 181;
 
 void getImage(char *image_name){
@@ -82,12 +83,13 @@ void rotator(int32_t I1, int32_t I2, int c, int32_t *O1, int32_t *O2){
 }
 
 int32_t scaleUp(int32_t I){
+    I = I >> 7;
     int32_t O = sqrt2 * I;
     return O;
 }
 
 void * loefflers(int32_t * x){
-    /*
+    
     int32_t A[8];
     
     //stage 1
@@ -95,34 +97,56 @@ void * loefflers(int32_t * x){
     reflector(x[1], x[6], &A[1], &A[6]);
     reflector(x[2], x[5], &A[2], &A[5]);
     reflector(x[3], x[4], &A[3], &A[4]);
+    printf("stage 1\n");
+    for (int i = 0; i < 8; i++) {
+        printf("%d, ", A[i]);
+    }
+    printf("\n\n");
     
     //stage 2
     reflector(A[0], A[3], &A[0], &A[3]);
     reflector(A[1], A[2], &A[1], &A[2]);
     
-    rotator(A[4], A[7], 1, 3, &A[4], &A[7]);
-    rotator(A[5], A[6], 1, 1, &A[5], &A[6]);
+    rotator(A[4], A[7], 1, &A[4], &A[7]);
+    rotator(A[5], A[6], 0, &A[5], &A[6]);
+    printf("stage 2\n");
+    for (int i = 0; i < 8; i++) {
+        printf("%d, ", A[i]);
+    }
+    printf("\n\n");
     
     //stage 3
     reflector(A[0], A[1], &A[0], &A[1]);
-    rotator(A[2], A[3], sqrt(2), 6, &A[2], &A[3]);
+    rotator(A[2], A[3], 2, &A[2], &A[3]);
     reflector(A[4], A[6], &A[4], &A[6]);
     reflector(A[7], A[5], &A[7], &A[5]);
+    printf("stage 3\n");
+    for (int i = 0; i < 8; i++) {
+        printf("%d, ", A[i]);
+    }
+    printf("\n\n");
+    
     
     //stage 4
     reflector(A[7], A[4], &A[7], &A[4]);
     A[5] = scaleUp(A[5]);
     A[6] = scaleUp(A[6]);
+    printf("stage 4\n");
+    for (int i = 0; i < 8; i++) {
+        printf("%d, ", A[i]);
+    }
+    printf("\n\n");
+    
     
     x[0] = A[0];
-    x[1] = A[4];
+    x[4] = A[1];
     x[2] = A[2];
-    x[3] = A[6];
-    x[4] = A[7];
-    x[5] = A[3];
-    x[6] = A[5];
-    x[7] = A[1];
-    */
+    x[6] = A[3];
+    x[7] = A[4];
+    x[3] = A[5];
+    x[5] = A[6];
+    x[1] = A[7];
+    
 }
 
 int main(int argc, char *argv[]){
@@ -188,17 +212,28 @@ int main(int argc, char *argv[]){
         }
         printf("\n");
     }
-    /*
+    */
+    
     // Loeffler's testing
-    int32_t I[8] = { 21, 21, 21, 21, 21, 21, 21, 21 };
+    int32_t I[8] = { 2, 1, 4, 9, 3, 8, 7, 2 };
+    float Out[8];
+    for(int i = 0; i < 8; i++){
+    	I[i] = I[i] * pow(2, 7);
+    }
 
     loefflers(I);
-    printf("\nTesting Loefflers with { 5, 8, 3, 1, 6, 2, 9, 1 } as input\n");
+    printf("\nTesting Loefflers with { 2, 1, 4, 9, 3, 8, 7, 2 } as input\n");
     for (int i = 0; i < 8; i++) {
-        printf("%f, ", I[i]);
+    	if(i != 0 && i != 4){
+    		Out[i] = I[i] >> 14;
+    	}
+    	else{
+    		Out[i] = I[i];
+    	}
+        printf("%f, ", Out[i]);
     }
     printf("\n\n");
-    
+    /*
     
     // Transpose testing
     int32_t *testMatrix;

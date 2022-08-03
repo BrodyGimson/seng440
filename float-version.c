@@ -90,6 +90,11 @@ void * loefflers(float * x){
     reflector(x[1], x[6], &A[1], &A[6]);
     reflector(x[2], x[5], &A[2], &A[5]);
     reflector(x[3], x[4], &A[3], &A[4]);
+    printf("stage 1\n");
+    for (int i = 0; i < 8; i++) {
+        printf("%f, ", A[i]);
+    }
+    printf("\n\n");
     
     //stage 2
     reflector(A[0], A[3], &A[0], &A[3]);
@@ -97,26 +102,41 @@ void * loefflers(float * x){
     
     rotator(A[4], A[7], 1, 3, &A[4], &A[7]);
     rotator(A[5], A[6], 1, 1, &A[5], &A[6]);
+    printf("stage 2\n");
+    for (int i = 0; i < 8; i++) {
+        printf("%f, ", A[i]);
+    }
+    printf("\n\n");
     
     //stage 3
     reflector(A[0], A[1], &A[0], &A[1]);
     rotator(A[2], A[3], sqrt(2), 6, &A[2], &A[3]);
     reflector(A[4], A[6], &A[4], &A[6]);
     reflector(A[7], A[5], &A[7], &A[5]);
+    printf("stage 3\n");
+    for (int i = 0; i < 8; i++) {
+        printf("%f, ", A[i]);
+    }
+    printf("\n\n");
     
     //stage 4
     reflector(A[7], A[4], &A[7], &A[4]);
     A[5] = scaleUp(A[5]);
     A[6] = scaleUp(A[6]);
+    printf("stage 4\n");
+    for (int i = 0; i < 8; i++) {
+        printf("%f, ", A[i]);
+    }
+    printf("\n\n");
     
     x[0] = A[0];
-    x[1] = A[4];
+    x[4] = A[1];
     x[2] = A[2];
-    x[3] = A[6];
-    x[4] = A[7];
-    x[5] = A[3];
-    x[6] = A[5];
-    x[7] = A[1];
+    x[6] = A[3];
+    x[7] = A[4];
+    x[3] = A[5];
+    x[5] = A[6];
+    x[1] = A[7];
 }
 
 int main(int argc, char *argv[]){
@@ -172,10 +192,10 @@ int main(int argc, char *argv[]){
     }
 
     // Loeffler's testing
-    float I[8] = { 21, 21, 21, 21, 21, 21, 21, 21 };
+    float I[8] = { 2, 1, 4, 9, 3, 8, 7, 2 };
 
     loefflers(I);
-    printf("\nTesting Loefflers with { 5, 8, 3, 1, 6, 2, 9, 1 } as input\n");
+    printf("\nTesting Loefflers with { 2, 1, 4, 9, 3, 8, 7, 2} as input\n");
     for (int i = 0; i < 8; i++) {
         printf("%f, ", I[i]);
     }
@@ -216,7 +236,7 @@ int main(int argc, char *argv[]){
         printf("\n");
     }
     */
-
+    /*
     // Loeffler Function Tests
     float I1 = 1;
     float I2 = 2;
@@ -298,6 +318,6 @@ int main(int argc, char *argv[]){
     		printf("\n");
     	}
     }
-    			
+    */			
     return 0;
 }
