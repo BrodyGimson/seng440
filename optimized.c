@@ -191,38 +191,34 @@ int main(int argc, char *argv[])
 
     printf("\n----TESTING AREA----\n");
 
-    // Loop used to run algorithm 100000 times
-    for (int c = 0; c < 100; c++) 
+    get_image(argv[1]);
+
+    for (int x = 0; x < 40; x++)
     {
-        get_image(argv[1]);
-
-        for (int x = 0; x < 40; x++)
+        for (int y = 0; y < 30; y++)
         {
-            for (int y = 0; y < 30; y++)
+            pos_x = x << 3;
+            pos_y = y << 3;
+
+            get_next_group(pos_x, pos_y, current_group);
+            
+            for (int i = 0; i < 8; i++)
             {
-                pos_x = x << 3;
-                pos_y = y << 3;
+                loefflers(current_group[i]);
+            }	
+            
+            transpose(current_group, current_group_trans);
+            
+            for (int i = 0; i < 8; i++)
+            {
+                loefflers(current_group_trans[i]);
+            }
 
-                get_next_group(pos_x, pos_y, current_group);
-                
-                for (int i = 0; i < 8; i++)
+            for (int i = 0; i < 8; i++) 
+            {
+                for (int j = 0; j < 8; j++) 
                 {
-                    loefflers(current_group[i]);
-                }	
-                
-                transpose(current_group, current_group_trans);
-                
-                for (int i = 0; i < 8; i++)
-                {
-                    loefflers(current_group_trans[i]);
-                }
-
-                for (int i = 0; i < 8; i++) 
-                {
-                    for (int j = 0; j < 8; j++) 
-                    {
-                        g_output_matrix[pos_x + i][pos_y + j] = current_group_trans[j][i];
-                    }
+                    g_output_matrix[pos_x + i][pos_y + j] = current_group_trans[j][i];
                 }
             }
         }
