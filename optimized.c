@@ -129,6 +129,7 @@ int32_t scale_up(int32_t input)
 void loefflers(int32_t * x)
 {
     int32_t tmp_output[8];
+    int32_t tmp_output2[8];
     
     //stage 1
     reflector(x[0], x[7], &tmp_output[0], &tmp_output[7]);
@@ -138,12 +139,12 @@ void loefflers(int32_t * x)
     
     // Even Numbers
     //stage 2
-    reflector(tmp_output[0], tmp_output[3], &tmp_output[0], &tmp_output[3]);
-    reflector(tmp_output[1], tmp_output[2], &tmp_output[1], &tmp_output[2]);
+    reflector(tmp_output[0], tmp_output[3], &tmp_output2[0], &tmp_output2[3]);
+    reflector(tmp_output[1], tmp_output[2], &tmp_output2[1], &tmp_output2[2]);
 
     // stage 3
-    reflector(tmp_output[0], tmp_output[1], &tmp_output[0], &tmp_output[1]);
-    rotator(tmp_output[2], tmp_output[3], 2, &tmp_output[2], &tmp_output[3]);
+    reflector(tmp_output2[0], tmp_output2[1], &tmp_output[0], &tmp_output[1]);
+    rotator(tmp_output2[2], tmp_output2[3], 2, &tmp_output[2], &tmp_output[3]);
     
     // unscramble values
     x[0] = tmp_output[0] << 7;
@@ -153,23 +154,23 @@ void loefflers(int32_t * x)
 
     //Odd Numbers
     // stage 2
-    rotator(tmp_output[4], tmp_output[7], 1, &tmp_output[4], &tmp_output[7]);
-    rotator(tmp_output[5], tmp_output[6], 0, &tmp_output[5], &tmp_output[6]);
+    rotator(tmp_output[4], tmp_output[7], 1, &tmp_output2[4], &tmp_output2[7]);
+    rotator(tmp_output[5], tmp_output[6], 0, &tmp_output2[5], &tmp_output2[6]);
     
     //stage 3
-    reflector(tmp_output[4], tmp_output[6], &tmp_output[4], &tmp_output[6]);
-    reflector(tmp_output[7], tmp_output[5], &tmp_output[7], &tmp_output[5]);
+    reflector(tmp_output2[4], tmp_output2[6], &tmp_output[4], &tmp_output[6]);
+    reflector(tmp_output2[7], tmp_output2[5], &tmp_output[7], &tmp_output[5]);
     
     //stage 4
-    reflector(tmp_output[7], tmp_output[4], &tmp_output[7], &tmp_output[4]);
-    tmp_output[5] = scale_up(tmp_output[5]);
-    tmp_output[6] = scale_up(tmp_output[6]);  
+    reflector(tmp_output[7], tmp_output[4], &tmp_output2[7], &tmp_output2[4]);
+    tmp_output2[5] = scale_up(tmp_output[5]);
+    tmp_output2[6] = scale_up(tmp_output[6]);  
     
     // unscramble values
-    x[7] = tmp_output[4] >> 7;
-    x[3] = tmp_output[5] >> 7;
-    x[5] = tmp_output[6] >> 7;
-    x[1] = tmp_output[7] >> 7;
+    x[7] = tmp_output2[4] >> 7;
+    x[3] = tmp_output2[5] >> 7;
+    x[5] = tmp_output2[6] >> 7;
+    x[1] = tmp_output2[7] >> 7;
 }
 
 int main(int argc, char *argv[])
