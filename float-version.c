@@ -134,174 +134,50 @@ int main(int argc, char *argv[]){
 
     printf("Filename: %s\n", argv[1]);
 
-    printf("Success\n");
-
-    printf("\n\n----TESTING AREA----\n\n");
+    printf("\n----TESTING AREA----\n\n");
 
     // Get image test
     getImage(argv[1]);
 
-    printf("Get Image Test:\n");
-    printf("Array first value: %f\n", pixel_matrix[0][0]);
-    printf("Array last value: %f\n", pixel_matrix[IMAGE_HEIGHT-1][IMAGE_WIDTH-1]);
-
-    // Get first group test
-    printf("\nGet first group of pixels:\n");
-
-    current_x = 0;
-    current_y = 0;
-
-    getNextGroup(current_x, current_y);
-
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            printf("%f ", current_group[i][j]);
-        }
-        printf("\n");
-    }
-
-    // Get center group test
-    printf("\nGet center group of pixels:\n");
-
-    current_y = 120;
-    current_x = 160;
-
-    getNextGroup(current_x, current_y);
-
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            printf("%f ", current_group[i][j]);
-        }
-        printf("\n");
-    }
-
-    // Loeffler's testing
-    float I[8] = { 2, 1, 4, 9, 3, 8, 7, 2 };
-
-    loefflers(I);
-    printf("\nTesting Loefflers with { 2, 1, 4, 9, 3, 8, 7, 2} as input\n");
-    for (int i = 0; i < 8; i++) {
-        printf("%f, ", I[i]);
-    }
-    printf("\n\n");
-
-    /*
-    // Transpose testing
-    float *testMatrix;
-
-    float A[N][M] = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}};
-    float B[M][N];
-
-    printf("Transpose test on \n");
-    for(int i = 0; i < N; i++){
-        for(int j = 0; j < M; j++){
-            printf("%f ", A[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\nTranspose\n");
-
-    transpose(A, B);
-
-    for(int i = 0; i < N; i++){
-        for(int j = 0; j < M; j++){
-            printf("%f ", B[i][j]);
-        }
-        printf("\n");
-    }
-
-    printf("\nTranspose back\n");
-    transpose(B, A);
-
-    for(int i = 0; i < N; i++){
-        for(int j = 0; j < M; j++){
-            printf("%f ", A[i][j]);
-        }
-        printf("\n");
-    }
-    */
-    /*
-    // Loeffler Function Tests
-    float I1 = 1;
-    float I2 = 2;
-	
-    float O[2];	
-
-    printf("\nReflector Test\n");
-    reflector(I1, I2, &O[0], &O[1]);
-    printf("I1: %f, I2: %f\n", I1, I2);
-    printf("O1: %f, O2: %f\n", O[0], O[1]);
-    
-    printf("\nRotator Test\n");
-    rotator(I1, I2, 1, 1, &O[0], &O[1]);
-    printf("I1: %f, I2: %f\n", I1, I2);
-    printf("O1: %f, O2: %f\n", O[0], O[1]);
-    
-    printf("\nScale Up Test\n");
-    printf("I1: %f, O: %f\n", I1, scaleUp(I1));
-    */
-    printf("\nLoefflers 8x8\n");
-    getNextGroup(120, 160);
+    printf("\nLoefflers 8x8 Corner\n");
+    getNextGroup(0, 0);
     for(int i = 0; i < 8; i++){
     	loefflers(current_group[i]);
     }
     
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            printf("%f ", current_group[i][j]);
-        }
-        printf("\n");
-    }			
-
-    printf("\n");
-    
     float current_group_t[8][8];
-    transpose(current_group, current_group_t);
-    printf("Transpose\n");
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            printf("%f ", current_group_t[i][j]);
-        }
-        printf("\n");
-    }
-    
-    printf("\n");	
+    transpose(current_group, current_group_t);	
     
     for(int i = 0; i < 8; i++){
     	loefflers(current_group_t[i]);
     }
     
+    transpose(current_group_t, current_group);
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
-            printf("%f ", current_group_t[i][j]);
+            printf("%f ", current_group[i][j]);
         }
         printf("\n");
     }
+
+    printf("\nLoefflers 8x8 Center\n");
+    getNextGroup(120, 160);
+    for(int i = 0; i < 8; i++){
+    	loefflers(current_group[i]);
+    }
     
-    for(int x = 0; x < 40; x++){
-    	for(int y = 0; y < 30; y++){
-    		getNextGroup(8*x, 8*y);
-    		
-    		for(int i = 0; i < 8; i++){
-    			loefflers(current_group[i]);
-    		}
-    		
-    		float current_group_t[8][8];
-    		transpose(current_group, current_group_t);
-    		
-    		for(int i = 0; i < 8; i++){
-    			loefflers(current_group_t[i]);
-    		}
-    		
-    		transpose(current_group_t, current_group);
-    		for (int i = 0; i < 8; i++) {
-        		for (int j = 0; j < 8; j++) {
-            			printf("%f ", current_group[i][j]);
-        		}
-        		printf("\n");
-    		}
-    		printf("\n");
-    	}
+    transpose(current_group, current_group_t);	
+    
+    for(int i = 0; i < 8; i++){
+    	loefflers(current_group_t[i]);
+    }
+    
+    transpose(current_group_t, current_group);
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            printf("%f ", current_group[i][j]);
+        }
+        printf("\n");
     }
     			
     return 0;
