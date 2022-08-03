@@ -29,7 +29,6 @@ int const END_SCALE = 16384;                                        // Ending sc
 // Barr-C: Global variables should start with "g_" (7.1.j)
 int32_t g_pixel_matrix[240][320];
 int32_t g_output_matrix[240][320];
-int32_t g_current_group[8][8];
 
 void get_image(char *p_image_name) 
 {
@@ -94,13 +93,13 @@ void transpose(int32_t orig[][8], int32_t trans[][8])
     }
 }
 
-void get_next_group(int current_x, int current_y) 
+void get_next_group(int current_x, int current_y, int32_t p_current_group[][8]) 
 {
     for (int i = 0; i < 8; i++) 
     {
         for (int j = 0; j < 8; j++) 
         {
-            g_current_group[i][j] = g_pixel_matrix[current_y + i][current_x + j];
+            p_current_group[i][j] = g_pixel_matrix[current_y + i][current_x + j];
         }
     }
 }
@@ -175,6 +174,7 @@ void loefflers(int32_t * x)
 
 int main(int argc, char *argv[])
 {
+    int32_t current_group[8][8];
     int32_t current_group_trans[8][8];
     
     if (argc != 2)
@@ -193,27 +193,27 @@ int main(int argc, char *argv[])
     {
         for (int y = 0; y < 30; y++)
         {
-    		get_next_group(8*x, 8*y);
+    		get_next_group(8*x, 8*y, current_group);
     		
     		for (int i = 0; i < 8; i++)
             {
-    			loefflers(g_current_group[i]);
+    			loefflers(current_group[i]);
     		}	
     		
-    		transpose(g_current_group, current_group_trans);
+    		transpose(current_group, current_group_trans);
     		
     		for (int i = 0; i < 8; i++)
             {
     			loefflers(current_group_trans[i]);
     		}
     		
-    		transpose(current_group_trans, g_current_group);
+    		transpose(current_group_trans, current_group);
 
     		for (int i = 0; i < 8; i++) 
             {
         		for (int j = 0; j < 8; j++) 
                 {
-            		g_output_matrix[x*8 + i][y*8 + j] = g_current_group[i][j];
+            		g_output_matrix[x*8 + i][y*8 + j] = current_group[i][j];
         		}
     		}
     	}
