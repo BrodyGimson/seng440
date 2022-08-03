@@ -21,14 +21,14 @@ int const IMAGE_WIDTH = 320;
 
 // Constants used in Loeffler's Algorithm
 int const SQRT2 = 181;
-int const ROTATE_CONST_p_output_1[3] = {-12873, -4520, 12539};      // Constants used for output 1 in rotators
-int const ROTATE_CONST_p_output_2[3] = {-19266, -22725, -30273};    // Constants used for output 2 in rotators
+int const ROTATE_CONST_O1[3] = {-12873, -4520, 12539};      // Constants used for output 1 in rotators
+int const ROTATE_CONST_O2[3] = {-19266, -22725, -30273};    // Constants used for output 2 in rotators
+int const ROTATE_CONST[3] = {16069, 13622, 8866};                   // Constants used for both in rotators
 int const END_SCALE = 16384;                                        // Ending scale factor
 
 // Barr-C: Global variables should start with "g_" (7.1.j)
 int32_t g_pixel_matrix[240][320];
 int32_t g_output_matrix[240][320];
-int32_t g_current_group[8][8];
 
 void get_image(char *p_image_name) 
 {
@@ -93,13 +93,13 @@ void transpose(int32_t orig[][8], int32_t trans[][8])
     }
 }
 
-void get_next_group(int current_x, int current_y) 
+void get_next_group(int current_x, int current_y, int32_t p_current_group[][8]) 
 {
     for (int i = 0; i < 8; ++i) 
     {
         for (int j = 0; j < 8; ++j) 
         {
-            g_current_group[i][j] = g_pixel_matrix[current_y + i][current_x + j];
+            p_current_group[i][j] = g_pixel_matrix[current_y + i][current_x + j];
         }
     }
 }
@@ -112,10 +112,9 @@ void * reflector(int32_t input_1, int32_t input_2, int32_t *p_output_1, int32_t 
 
 void rotator(int32_t input_1, int32_t input_2, int c, int32_t *p_output_1, int32_t *p_output_2)
 {
-	int ROTATE_CONST[3] = {16069, 13622, 8866}; 	// Constant used for both in rotators
     // Barr-C: Don't rely on C's operation precedence rules, use parentheses (1.4.a)
-    p_output_1[0] = (ROTATE_CONST_p_output_1[c] * input_2) + (ROTATE_CONST[c] * (input_1 + input_2));
-    p_output_2[0] = (ROTATE_CONST_p_output_2[c] * input_1) + (ROTATE_CONST[c] * (input_1 + input_2));
+    p_output_1[0] = (ROTATE_CONST_O1[c] * input_2) + (ROTATE_CONST[c] * (input_1 + input_2));
+    p_output_2[0] = (ROTATE_CONST_O2[c] * input_1) + (ROTATE_CONST[c] * (input_1 + input_2));
 }
 
 int32_t scale_up(int32_t input)
@@ -126,7 +125,7 @@ int32_t scale_up(int32_t input)
     return output;
 }
 
-void * loefflers(int32_t * x)
+void loefflers(int32_t * x)
 {
     int32_t tmp_output[8];
     
@@ -136,16 +135,27 @@ void * loefflers(int32_t * x)
     reflector(x[2], x[5], &tmp_output[2], &tmp_output[5]);
     reflector(x[3], x[4], &tmp_output[3], &tmp_output[4]);
     
+    // Even Numbers
     //stage 2
     reflector(tmp_output[0], tmp_output[3], &tmp_output[0], &tmp_output[3]);
     reflector(tmp_output[1], tmp_output[2], &tmp_output[1], &tmp_output[2]);
+
+    // stage 3
+    reflector(tmp_output[0], tmp_output[1], &tmp_output[0], &tmp_output[1]);
+    rotator(tmp_output[2], tmp_output[3], 2, &tmp_output[2], &tmp_output[3]);
     
+    // unscramble values
+    x[0] = tmp_output[0] << 7;
+    x[4] = tmp_output[1] << 7;
+    x[2] = tmp_output[2] >> 7;
+    x[6] = tmp_output[3] >> 7;
+
+    //Odd Numbers
+    // stage 2
     rotator(tmp_output[4], tmp_output[7], 1, &tmp_output[4], &tmp_output[7]);
     rotator(tmp_output[5], tmp_output[6], 0, &tmp_output[5], &tmp_output[6]);
     
     //stage 3
-    reflector(tmp_output[0], tmp_output[1], &tmp_output[0], &tmp_output[1]);
-    rotator(tmp_output[2], tmp_output[3], 2, &tmp_output[2], &tmp_output[3]);
     reflector(tmp_output[4], tmp_output[6], &tmp_output[4], &tmp_output[6]);
     reflector(tmp_output[7], tmp_output[5], &tmp_output[7], &tmp_output[5]);
     
@@ -155,10 +165,6 @@ void * loefflers(int32_t * x)
     tmp_output[6] = scale_up(tmp_output[6]);  
     
     // unscramble values
-    x[0] = tmp_output[0] << 7;
-    x[4] = tmp_output[1] << 7;
-    x[2] = tmp_output[2] >> 7;
-    x[6] = tmp_output[3] >> 7;
     x[7] = tmp_output[4] >> 7;
     x[3] = tmp_output[5] >> 7;
     x[5] = tmp_output[6] >> 7;
@@ -167,7 +173,10 @@ void * loefflers(int32_t * x)
 
 int main(int argc, char *argv[])
 {
+    int32_t current_group[8][8];
     int32_t current_group_trans[8][8];
+    int pos_y;
+    int pos_x;
     
     if (argc != 2)
     {
@@ -185,33 +194,35 @@ int main(int argc, char *argv[])
     {
         for (int y = 0; y < 30; ++y)
         {
-    		get_next_group(8*x, 8*y);
+            pos_x = x << 3;
+            pos_y = y << 3;
+
+    		get_next_group(pos_x, pos_y, current_group);
     		
     		for (int i = 0; i < 8; ++i)
             {
-    			loefflers(g_current_group[i]);
+    			loefflers(current_group[i]);
     		}	
     		
-    		transpose(g_current_group, current_group_trans);
+    		transpose(current_group, current_group_trans);
     		
     		for (int i = 0; i < 8; ++i)
             {
     			loefflers(current_group_trans[i]);
     		}
-    		
-    		transpose(current_group_trans, g_current_group);
 
     		for (int i = 0; i < 8; ++i) 
             {
         		for (int j = 0; j < 8; ++j) 
                 {
-            		g_output_matrix[x*8 + i][y*8 + j] = g_current_group[i][j];
+            		g_output_matrix[pos_x + i][pos_y + j] = current_group_trans[j][i];
         		}
     		}
     	}
     }
 
     printf("\nCorner 8x8:\n");
+
     for (int i = 0; i < 8; ++i) 
     {
         for (int j = 0; j < 8; ++j) 
