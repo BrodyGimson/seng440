@@ -397,38 +397,22 @@ loefflers:
 	ldr	r3, [fp, #-40]
 	rsb	r3, r3, r2
 	str	r3, [fp, #-8]
-	ldr	r3, [fp, #-36]
-	str	r3, [fp, #-68]
-	ldr	r3, [fp, #-32]
-	str	r3, [fp, #-64]
-	ldr	r3, [fp, #-28]
-	str	r3, [fp, #-60]
+	ldr	r2, [fp, #-36]
 	ldr	r3, [fp, #-24]
-	str	r3, [fp, #-56]
-	ldr	r2, [fp, #-68]
-	ldr	r3, [fp, #-56]
 	add	r3, r2, r3
-	str	r3, [fp, #-36]
-	ldr	r2, [fp, #-68]
-	ldr	r3, [fp, #-56]
-	rsb	r3, r3, r2
-	str	r3, [fp, #-24]
-	ldr	r2, [fp, #-64]
-	ldr	r3, [fp, #-60]
-	add	r3, r2, r3
-	str	r3, [fp, #-32]
-	ldr	r2, [fp, #-64]
-	ldr	r3, [fp, #-60]
-	rsb	r3, r3, r2
-	str	r3, [fp, #-28]
-	ldr	r3, [fp, #-36]
 	str	r3, [fp, #-68]
-	ldr	r3, [fp, #-32]
-	str	r3, [fp, #-64]
-	ldr	r3, [fp, #-28]
-	str	r3, [fp, #-60]
+	ldr	r2, [fp, #-36]
 	ldr	r3, [fp, #-24]
+	rsb	r3, r3, r2
 	str	r3, [fp, #-56]
+	ldr	r2, [fp, #-32]
+	ldr	r3, [fp, #-28]
+	add	r3, r2, r3
+	str	r3, [fp, #-64]
+	ldr	r2, [fp, #-32]
+	ldr	r3, [fp, #-28]
+	rsb	r3, r3, r2
+	str	r3, [fp, #-60]
 	ldr	r2, [fp, #-68]
 	ldr	r3, [fp, #-64]
 	add	r3, r2, r3
@@ -480,70 +464,54 @@ loefflers:
 	ldr	r3, [fp, #-24]
 	mov	r3, r3, asr #7
 	str	r3, [r2, #0]
-	ldr	r3, [fp, #-20]
-	str	r3, [fp, #-52]
-	ldr	r3, [fp, #-16]
-	str	r3, [fp, #-48]
-	ldr	r3, [fp, #-12]
-	str	r3, [fp, #-44]
-	ldr	r3, [fp, #-8]
-	str	r3, [fp, #-40]
 	ldr	r3, .L33
 	ldr	r2, [r3, #4]
-	ldr	r3, [fp, #-40]
+	ldr	r3, [fp, #-8]
 	mul	r0, r3, r2
 	ldr	r3, .L33+4
 	ldr	r1, [r3, #4]
-	ldr	r2, [fp, #-40]
-	ldr	r3, [fp, #-52]
+	ldr	r2, [fp, #-8]
+	ldr	r3, [fp, #-20]
 	add	r3, r2, r3
 	mul	r3, r1, r3
 	add	r3, r0, r3
-	str	r3, [fp, #-20]
+	str	r3, [fp, #-52]
 	ldr	r3, .L33+8
 	ldr	r2, [r3, #4]
-	ldr	r3, [fp, #-52]
+	ldr	r3, [fp, #-20]
 	mul	r0, r3, r2
 	ldr	r3, .L33+4
 	ldr	r1, [r3, #4]
-	ldr	r2, [fp, #-40]
-	ldr	r3, [fp, #-52]
+	ldr	r2, [fp, #-8]
+	ldr	r3, [fp, #-20]
 	add	r3, r2, r3
 	mul	r3, r1, r3
 	add	r3, r0, r3
-	str	r3, [fp, #-8]
+	str	r3, [fp, #-40]
 	ldr	r3, .L33
 	ldr	r2, [r3, #0]
-	ldr	r3, [fp, #-44]
+	ldr	r3, [fp, #-12]
 	mul	r0, r3, r2
 	ldr	r3, .L33+4
 	ldr	r1, [r3, #0]
-	ldr	r2, [fp, #-48]
-	ldr	r3, [fp, #-44]
+	ldr	r2, [fp, #-16]
+	ldr	r3, [fp, #-12]
 	add	r3, r2, r3
 	mul	r3, r1, r3
 	add	r3, r0, r3
-	str	r3, [fp, #-16]
+	str	r3, [fp, #-48]
 	ldr	r3, .L33+8
 	ldr	r2, [r3, #0]
-	ldr	r3, [fp, #-48]
+	ldr	r3, [fp, #-16]
 	mul	r0, r3, r2
 	ldr	r3, .L33+4
 	ldr	r1, [r3, #0]
-	ldr	r2, [fp, #-48]
-	ldr	r3, [fp, #-44]
+	ldr	r2, [fp, #-16]
+	ldr	r3, [fp, #-12]
 	add	r3, r2, r3
 	mul	r3, r1, r3
 	add	r3, r0, r3
-	str	r3, [fp, #-12]
-	ldr	r3, [fp, #-20]
-	str	r3, [fp, #-52]
-	ldr	r3, [fp, #-16]
-	str	r3, [fp, #-48]
-	ldr	r3, [fp, #-12]
 	str	r3, [fp, #-44]
-	ldr	r3, [fp, #-8]
-	str	r3, [fp, #-40]
 	ldr	r2, [fp, #-52]
 	ldr	r3, [fp, #-44]
 	add	r3, r2, r3
@@ -560,48 +528,40 @@ loefflers:
 	ldr	r3, [fp, #-48]
 	rsb	r3, r3, r2
 	str	r3, [fp, #-16]
+	ldr	r2, [fp, #-8]
 	ldr	r3, [fp, #-20]
-	str	r3, [fp, #-52]
-	ldr	r3, [fp, #-16]
-	str	r3, [fp, #-48]
-	ldr	r3, [fp, #-12]
-	str	r3, [fp, #-44]
-	ldr	r3, [fp, #-8]
-	str	r3, [fp, #-40]
-	ldr	r2, [fp, #-40]
-	ldr	r3, [fp, #-52]
 	add	r3, r2, r3
-	str	r3, [fp, #-8]
-	ldr	r2, [fp, #-40]
-	ldr	r3, [fp, #-52]
+	str	r3, [fp, #-40]
+	ldr	r2, [fp, #-8]
+	ldr	r3, [fp, #-20]
 	rsb	r3, r3, r2
-	str	r3, [fp, #-20]
-	ldr	r0, [fp, #-48]
+	str	r3, [fp, #-52]
+	ldr	r0, [fp, #-16]
 	bl	scale_up
 	mov	r3, r0
-	str	r3, [fp, #-16]
-	ldr	r0, [fp, #-44]
+	str	r3, [fp, #-48]
+	ldr	r0, [fp, #-12]
 	bl	scale_up
 	mov	r3, r0
-	str	r3, [fp, #-12]
+	str	r3, [fp, #-44]
 	ldr	r3, [fp, #-72]
 	add	r2, r3, #28
-	ldr	r3, [fp, #-20]
+	ldr	r3, [fp, #-52]
 	mov	r3, r3, asr #7
 	str	r3, [r2, #0]
 	ldr	r3, [fp, #-72]
 	add	r2, r3, #12
-	ldr	r3, [fp, #-16]
+	ldr	r3, [fp, #-48]
 	mov	r3, r3, asr #7
 	str	r3, [r2, #0]
 	ldr	r3, [fp, #-72]
 	add	r2, r3, #20
-	ldr	r3, [fp, #-12]
+	ldr	r3, [fp, #-44]
 	mov	r3, r3, asr #7
 	str	r3, [r2, #0]
 	ldr	r3, [fp, #-72]
 	add	r2, r3, #4
-	ldr	r3, [fp, #-8]
+	ldr	r3, [fp, #-40]
 	mov	r3, r3, asr #7
 	str	r3, [r2, #0]
 	sub	sp, fp, #4
