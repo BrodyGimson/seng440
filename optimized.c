@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
 
     printf("\n----TESTING AREA----\n");
 
-    get_image(argv[1]);
+    get_image("test_image.bmp");
 
     for (int x = 0; x < 40; x++)
     {
