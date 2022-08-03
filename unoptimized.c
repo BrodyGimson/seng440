@@ -81,6 +81,7 @@ void get_image(char *p_image_name)
             }
         }
     }
+    fclose(p_image_file);
 }
 
 void transpose(int32_t orig[][8], int32_t trans[][8])
@@ -186,30 +187,30 @@ int main(int argc, char *argv[])
     {
         for (int y = 0; y < 30; y++)
         {
-    		get_next_group(8*x, 8*y);
-    		
-    		for (int i = 0; i < 8; i++)
+            get_next_group(8*x, 8*y);
+            
+            for (int i = 0; i < 8; i++)
             {
-    			loefflers(g_current_group[i]);
-    		}	
-    		
-    		transpose(g_current_group, current_group_trans);
-    		
-    		for (int i = 0; i < 8; i++)
+                loefflers(g_current_group[i]);
+            }	
+            
+            transpose(g_current_group, current_group_trans);
+            
+            for (int i = 0; i < 8; i++)
             {
-    			loefflers(current_group_trans[i]);
-    		}
-    		
-    		transpose(current_group_trans, g_current_group);
+                loefflers(current_group_trans[i]);
+            }
+            
+            transpose(current_group_trans, g_current_group);
 
-    		for (int i = 0; i < 8; i++) 
+            for (int i = 0; i < 8; i++) 
             {
-        		for (int j = 0; j < 8; j++) 
+                for (int j = 0; j < 8; j++) 
                 {
-            		g_output_matrix[x*8 + i][y*8 + j] = g_current_group[i][j];
-        		}
-    		}
-    	}
+                    g_output_matrix[x*8 + i][y*8 + j] = g_current_group[i][j];
+                }
+            }
+        }
     }
 
     printf("\nCorner 8x8:\n");

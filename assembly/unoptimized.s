@@ -34,19 +34,19 @@ IMAGE_WIDTH:
 	.size	SQRT2, 4
 SQRT2:
 	.word	181
-	.global	ROTATE_CONST_p_output_1
+	.global	ROTATE_CONST_O1
 	.align	2
-	.type	ROTATE_CONST_p_output_1, %object
-	.size	ROTATE_CONST_p_output_1, 12
-ROTATE_CONST_p_output_1:
+	.type	ROTATE_CONST_O1, %object
+	.size	ROTATE_CONST_O1, 12
+ROTATE_CONST_O1:
 	.word	-12873
 	.word	-4520
 	.word	12539
-	.global	ROTATE_CONST_p_output_2
+	.global	ROTATE_CONST_O2
 	.align	2
-	.type	ROTATE_CONST_p_output_2, %object
-	.size	ROTATE_CONST_p_output_2, 12
-ROTATE_CONST_p_output_2:
+	.type	ROTATE_CONST_O2, %object
+	.size	ROTATE_CONST_O2, 12
+ROTATE_CONST_O2:
 	.word	-19266
 	.word	-22725
 	.word	-30273
@@ -169,6 +169,8 @@ get_image:
 	ldr	r3, [fp, #-12]
 	cmp	r3, r2
 	blt	.L9
+	ldr	r0, [fp, #-24]
+	bl	fclose
 	sub	sp, fp, #4
 	ldmfd	sp!, {fp, pc}
 .L12:
@@ -299,12 +301,12 @@ get_next_group:
 	.global	reflector
 	.type	reflector, %function
 reflector:
-	@ args = 0, pretend = 0, frame = 24
+	@ args = 0, pretend = 0, frame = 16
 	@ frame_needed = 1, uses_anonymous_args = 0
 	@ link register save eliminated.
 	str	fp, [sp, #-4]!
 	add	fp, sp, #0
-	sub	sp, sp, #28
+	sub	sp, sp, #20
 	str	r0, [fp, #-8]
 	str	r1, [fp, #-12]
 	str	r2, [fp, #-16]
@@ -373,9 +375,9 @@ rotator:
 .L32:
 	.align	2
 .L31:
-	.word	ROTATE_CONST_p_output_1
+	.word	ROTATE_CONST_O1
 	.word	ROTATE_CONST
-	.word	ROTATE_CONST_p_output_2
+	.word	ROTATE_CONST_O2
 	.size	rotator, .-rotator
 	.align	2
 	.global	scale_up
