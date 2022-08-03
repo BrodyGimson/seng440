@@ -360,38 +360,37 @@ main:
 	mov	r3, r0
 	cmp	r0, #2
 	beq	.L41
-	ldr	r0, .L64
+	ldr	r0, .L67
 	sub	r1, r3, #1
 	bl	printf
 	mov	r0, #1
 	b	.L42
 .L41:
 	mov	r4, r1
-	ldr	r0, .L64+4
+	ldr	r0, .L67+4
 	ldr	r1, [r4, #4]!
 	bl	printf
-	ldr	r0, .L64+8
+	ldr	r0, .L67+8
 	bl	puts
 	ldr	r0, [r4, #0]
 	bl	get_image
 	mov	r3, #0
 	str	r3, [sp, #12]
-	add	r5, sp, #272
-	ldr	fp, .L64+12
-	mov	sl, r5
-	add	r9, sp, #16
-	add	r3, sp, #304
-	str	r3, [sp, #8]
+	add	r9, sp, #272
+	add	fp, sp, #16
+	mov	r8, r9
+	ldr	sl, .L67+12
+	stmib	sp, {r9, fp}	@ phole stm
 	mov	r3, #0
-	str	r3, [sp, #4]
+	str	r3, [sp, #0]
 	b	.L43
-.L48:
-	mov	r6, r8, asl #3
-	mov	r0, r7
-	mov	r1, r6
-	mov	r2, sl
+.L49:
+	mov	r5, r7, asl #3
+	mov	r0, r6
+	mov	r1, r5
+	mov	r2, r8
 	bl	get_next_group
-	mov	r4, sl
+	mov	r4, r8
 .L44:
 	mov	r0, r4
 	bl	loefflers
@@ -399,49 +398,44 @@ main:
 	add	r3, sp, #528
 	cmp	r4, r3
 	bne	.L44
-	mov	r0, sl
-	mov	r1, r9
+	mov	r0, r8
+	ldr	r1, [sp, #8]
 	bl	transpose
-	mov	r4, r9
+	ldr	r4, [sp, #8]
 .L45:
 	mov	r0, r4
 	bl	loefflers
 	add	r4, r4, #32
-	cmp	r4, r5
+	cmp	r9, r4
 	bne	.L45
-	mov	r0, r9
-	mov	r1, sl
-	bl	transpose
-	ldr	r0, [sp, #8]
-	ldr	ip, [sp, #4]
-	b	.L46
+	b	.L66
 .L47:
-	ldr	r3, [r1], #4
+	ldr	r3, [r1], #32
 	str	r3, [r2], #4
 	cmp	r1, r0
 	bne	.L47
 	add	ip, ip, #1
-	add	r0, r0, #32
+	add	r0, r0, #4
 	cmp	ip, #8
-	bne	.L46
-	add	r8, r8, #1
-	cmp	r8, #30
 	bne	.L48
+	add	r7, r7, #1
+	cmp	r7, #30
+	bne	.L49
 	ldr	r3, [sp, #12]
 	add	r3, r3, #1
 	str	r3, [sp, #12]
 	cmp	r3, #40
 	bne	.L43
-	ldr	r0, .L64+16
+	ldr	r0, .L67+16
 	bl	puts
 	mov	r5, #0
-	ldr	sl, .L64+12
+	ldr	sl, .L67+12
 	mov	r9, r5
-	ldr	fp, .L64+20
+	ldr	fp, .L67+20
 	mov	r7, #0
-	ldr	r8, .L64+24
-	b	.L49
-.L50:
+	ldr	r8, .L67+24
+	b	.L50
+.L51:
 	ldr	r0, [r6], #4
 	bl	__aeabi_i2d
 	mov	r2, r7
@@ -453,23 +447,23 @@ main:
 	bl	printf
 	add	r4, r4, #1
 	cmp	r4, #8
-	bne	.L50
+	bne	.L51
 	mov	r0, #10
 	bl	putchar
 	add	r5, r5, #1
 	cmp	r5, #8
-	bne	.L49
-	ldr	r0, .L64+28
+	bne	.L50
+	ldr	r0, .L67+28
 	bl	puts
-	ldr	r6, .L64+32
+	ldr	r6, .L67+32
 	add	r5, r5, #112
-	ldr	sl, .L64+12
-	ldr	r9, .L64+20
+	ldr	sl, .L67+12
+	ldr	r9, .L67+20
 	mov	r7, #0
-	ldr	r8, .L64+24
+	ldr	r8, .L67+24
 	mov	fp, #10
-	b	.L51
-.L52:
+	b	.L52
+.L53:
 	ldr	r0, [r4], #4
 	bl	__aeabi_i2d
 	mov	r2, r7
@@ -479,51 +473,54 @@ main:
 	mov	r3, r1
 	mov	r0, r9
 	bl	printf
-	cmp	r4, r6
-	bne	.L52
+	cmp	r6, r4
+	bne	.L53
 	mov	r0, fp
 	bl	putchar
 	add	r5, r5, #1
 	add	r6, r6, #1280
 	cmp	r5, #128
-	bne	.L51
+	bne	.L52
 	mov	r0, #0
 .L42:
 	add	sp, sp, #532
 	ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
-.L51:
+.L52:
 	mov	r3, r5, asl #8
 	mov	r2, r5, asl #10
 	add	r3, r3, r2
 	add	r3, r3, #640
 	add	r4, sl, r3
-	b	.L52
-.L49:
+	b	.L53
+.L50:
 	mov	r3, r5, asl #8
 	mov	r2, r5, asl #10
 	add	r3, r3, r2
 	add	r6, sl, r3
 	mov	r4, r9
-	b	.L50
-.L46:
-	mov	r3, ip, asl #5
-	add	r1, r5, r3
-	add	r2, ip, r7
+	b	.L51
+.L66:
+	ldr	r0, [sp, #4]
+	ldr	ip, [sp, #0]
+.L48:
+	mov	r3, ip, asl #2
+	add	r1, fp, r3
+	add	r2, ip, r6
 	mov	r3, r2, asl #6
 	mov	r2, r2, asl #8
 	add	r3, r3, r2
-	add	r3, r3, r6
+	add	r3, r3, r5
 	mov	r3, r3, asl #2
-	add	r2, fp, r3
+	add	r2, sl, r3
 	b	.L47
 .L43:
 	ldr	r3, [sp, #12]
-	mov	r7, r3, asl #3
-	mov	r8, #0
-	b	.L48
-.L65:
+	mov	r6, r3, asl #3
+	mov	r7, #0
+	b	.L49
+.L68:
 	.align	2
-.L64:
+.L67:
 	.word	.LC4
 	.word	.LC5
 	.word	.LC6
