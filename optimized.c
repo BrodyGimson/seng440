@@ -211,14 +211,12 @@ int main(int argc, char *argv[])
             {
     			loefflers(current_group_trans[i]);
     		}
-    		
-    		transpose(current_group_trans, current_group);
 
     		for (int i = 0; i < 8; i++) 
             {
         		for (int j = 0; j < 8; j++) 
                 {
-            		g_output_matrix[pos_x + i][pos_y + j] = current_group[i][j];
+            		g_output_matrix[pos_x + i][pos_y + j] = current_group_trans[j][i];
         		}
     		}
     	}
