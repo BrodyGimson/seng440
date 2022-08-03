@@ -64,9 +64,9 @@ void get_image(char *p_image_name)
         perror("Error: Could not seek past colour table of file");
     }
     
-    for (int i = 0; i < IMAGE_HEIGHT; i++) 
+    for (int i = 0; i < IMAGE_HEIGHT; ++i) 
     {
-        for (int j = 0; j < IMAGE_WIDTH; j++) 
+        for (int j = 0; j < IMAGE_WIDTH; ++j) 
         {
             cbinary = fgetc(p_image_file);
 
@@ -84,9 +84,9 @@ void get_image(char *p_image_name)
 
 void transpose(int32_t orig[][8], int32_t trans[][8])
 {
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 8; ++i)
     {
-        for (int j = 0; j < 8; j++) 
+        for (int j = 0; j < 8; ++j) 
         {
             trans[i][j] = orig[j][i];
         }
@@ -95,16 +95,16 @@ void transpose(int32_t orig[][8], int32_t trans[][8])
 
 void get_next_group(int current_x, int current_y, int32_t p_current_group[][8]) 
 {
-    for (int i = 0; i < 8; i++) 
+    for (int i = 0; i < 8; ++i) 
     {
-        for (int j = 0; j < 8; j++) 
+        for (int j = 0; j < 8; ++j) 
         {
             p_current_group[i][j] = g_pixel_matrix[current_y + i][current_x + j];
         }
     }
 }
 
-void reflector(int32_t input_1, int32_t input_2, int32_t *p_output_1, int32_t *p_output_2)
+void * reflector(int32_t input_1, int32_t input_2, int32_t *p_output_1, int32_t *p_output_2)
 {       
     p_output_1[0] = input_1 + input_2;
     p_output_2[0] = input_1 - input_2;
@@ -121,8 +121,7 @@ int32_t scale_up(int32_t input)
 {
     int32_t output;
 
-    input = input >> 7;
-    output = SQRT2 * input;
+    output = SQRT2 * (input >> 7);
     return output;
 }
 
@@ -191,30 +190,30 @@ int main(int argc, char *argv[])
 
     get_image(argv[1]);
 
-    for (int x = 0; x < 40; x++)
+    for (int x = 0; x < 40; ++x)
     {
-        for (int y = 0; y < 30; y++)
+        for (int y = 0; y < 30; ++y)
         {
             pos_x = x << 3;
             pos_y = y << 3;
 
     		get_next_group(pos_x, pos_y, current_group);
     		
-    		for (int i = 0; i < 8; i++)
+    		for (int i = 0; i < 8; ++i)
             {
     			loefflers(current_group[i]);
     		}	
     		
     		transpose(current_group, current_group_trans);
     		
-    		for (int i = 0; i < 8; i++)
+    		for (int i = 0; i < 8; ++i)
             {
     			loefflers(current_group_trans[i]);
     		}
 
-    		for (int i = 0; i < 8; i++) 
+    		for (int i = 0; i < 8; ++i) 
             {
-        		for (int j = 0; j < 8; j++) 
+        		for (int j = 0; j < 8; ++j) 
                 {
             		g_output_matrix[pos_x + i][pos_y + j] = current_group_trans[j][i];
         		}
@@ -223,9 +222,10 @@ int main(int argc, char *argv[])
     }
 
     printf("\nCorner 8x8:\n");
-    for (int i = 0; i < 8; i++) 
+
+    for (int i = 0; i < 8; ++i) 
     {
-        for (int j = 0; j < 8; j++) 
+        for (int j = 0; j < 8; ++j) 
         {
             printf("%f, ", (double) g_output_matrix[i][j] / END_SCALE);
         }
@@ -233,9 +233,9 @@ int main(int argc, char *argv[])
     }
 
     printf("\nCenter 8x8:\n");
-    for (int i = 0; i < 8; i++) 
+    for (int i = 0; i < 8; ++i) 
     {
-        for (int j = 0; j < 8; j++) 
+        for (int j = 0; j < 8; ++j) 
         {
             printf("%f, ", (double) g_output_matrix[i + 120][j + 160] / END_SCALE);
         }
