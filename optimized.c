@@ -137,29 +137,36 @@ void * loefflers(int32_t * x)
     reflector(x[2], x[5], &tmp_output[2], &tmp_output[5]);
     reflector(x[3], x[4], &tmp_output[3], &tmp_output[4]);
     
-    //stage 2
+    // Even numbers
+    //stage 2 
     reflector(tmp_output[0], tmp_output[3], &tmp_output[0], &tmp_output[3]);
     reflector(tmp_output[1], tmp_output[2], &tmp_output[1], &tmp_output[2]);
-    
-    rotator(tmp_output[4], tmp_output[7], 1, &tmp_output[4], &tmp_output[7]);
-    rotator(tmp_output[5], tmp_output[6], 0, &tmp_output[5], &tmp_output[6]);
     
     //stage 3
     reflector(tmp_output[0], tmp_output[1], &tmp_output[0], &tmp_output[1]);
     rotator(tmp_output[2], tmp_output[3], 2, &tmp_output[2], &tmp_output[3]);
+
+    // unscramble values
+    x[0] = tmp_output[0] << 7;
+    x[4] = tmp_output[1] << 7;
+    x[2] = tmp_output[2] >> 7;
+    x[6] = tmp_output[3] >> 7;
+    
+    // Odd numbers
+    // stage 2
+    rotator(tmp_output[4], tmp_output[7], 1, &tmp_output[4], &tmp_output[7]);
+    rotator(tmp_output[5], tmp_output[6], 0, &tmp_output[5], &tmp_output[6]);
+
+    // stage 3
     reflector(tmp_output[4], tmp_output[6], &tmp_output[4], &tmp_output[6]);
     reflector(tmp_output[7], tmp_output[5], &tmp_output[7], &tmp_output[5]);
-    
+
     //stage 4
     reflector(tmp_output[7], tmp_output[4], &tmp_output[7], &tmp_output[4]);
     tmp_output[5] = scale_up(tmp_output[5]);
     tmp_output[6] = scale_up(tmp_output[6]);  
     
     // unscramble values
-    x[0] = tmp_output[0] << 7;
-    x[4] = tmp_output[1] << 7;
-    x[2] = tmp_output[2] >> 7;
-    x[6] = tmp_output[3] >> 7;
     x[7] = tmp_output[4] >> 7;
     x[3] = tmp_output[5] >> 7;
     x[5] = tmp_output[6] >> 7;
