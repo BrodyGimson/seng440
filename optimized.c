@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
     {
         for (int y = 0; y < 30; y++)
         {
-    		get_next_group(8*x, 8*y, current_group);
+    		get_next_group(x << 3, y << 3, current_group);
     		
     		for (int i = 0; i < 8; i++)
             {
@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
             {
         		for (int j = 0; j < 8; j++) 
                 {
-            		g_output_matrix[x*8 + i][y*8 + j] = current_group[i][j];
+            		g_output_matrix[(x << 3) + i][(y << 3) + j] = current_group[i][j];
         		}
     		}
     	}
