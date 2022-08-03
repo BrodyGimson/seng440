@@ -4,5 +4,4 @@ unoptimized
 optimized
 neon
 .vscode
-*.bmp
 *.exe
