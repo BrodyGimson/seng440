@@ -89,6 +89,62 @@ get_next_group:
 	.word	g_current_group
 	.size	get_next_group, .-get_next_group
 	.align	2
+	.global	reflector
+	.type	reflector, %function
+reflector:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
+	add	ip, r1, r0
+	str	ip, [r2, #0]
+	rsb	r0, r1, r0
+	str	r0, [r3, #0]
+	bx	lr
+	.size	reflector, .-reflector
+	.align	2
+	.global	rotator
+	.type	rotator, %function
+rotator:
+	@ args = 4, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
+	stmfd	sp!, {r4, r5}
+	ldr	r4, .L21
+	add	r5, r1, r0
+	ldr	ip, [r4, r2, asl #2]
+	mul	ip, r5, ip
+	mov	r2, r2, asl #2
+	add	r4, r4, r2
+	ldr	r2, [r4, #12]
+	mla	r2, r1, r2, ip
+	str	r2, [r3, #0]
+	ldr	r3, [r4, #24]
+	mla	r2, r3, r0, ip
+	ldr	r3, [sp, #8]
+	str	r2, [r3, #0]
+	ldmfd	sp!, {r4, r5}
+	bx	lr
+.L22:
+	.align	2
+.L21:
+	.word	.LANCHOR0
+	.size	rotator, .-rotator
+	.align	2
+	.global	scale_up
+	.type	scale_up, %function
+scale_up:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
+	mov	r0, r0, asr #7
+	mov	r2, r0, asl #4
+	sub	r2, r2, r0, asl #2
+	mov	r3, r2, asl #4
+	rsb	r3, r2, r3
+	add	r0, r3, r0
+	bx	lr
+	.size	scale_up, .-scale_up
+	.align	2
 	.global	loefflers
 	.type	loefflers, %function
 loefflers:
@@ -200,20 +256,19 @@ loefflers:
 	bl	reflector
 	ldr	r0, [sp, #44]
 	bl	scale_up
-	str	r0, [sp, #44]
+	mov	r4, r0
 	ldr	r0, [sp, #48]
 	bl	scale_up
 	ldr	r3, [sp, #40]
 	mov	r3, r3, asr #7
 	ldr	r2, [sp, #8]
 	str	r3, [r2, #0]
-	ldr	r3, [sp, #44]
-	mov	r3, r3, asr #7
-	ldr	r2, [sp, #20]
-	str	r3, [r2, #0]
+	mov	r4, r4, asr #7
+	ldr	r3, [sp, #20]
+	str	r4, [r3, #0]
 	mov	r0, r0, asr #7
-	ldr	r3, [sp, #16]
-	str	r0, [r3, #0]
+	ldr	r2, [sp, #16]
+	str	r0, [r2, #0]
 	ldr	r3, [sp, #52]
 	mov	r3, r3, asr #7
 	ldr	r2, [sp, #12]
@@ -229,63 +284,63 @@ get_image:
 	@ frame_needed = 0, uses_anonymous_args = 0
 	stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
 	mov	r4, r0
-	ldr	r3, .L30
+	ldr	r3, .L38
 	ldr	r0, [r3, #0]
 	bl	fflush
 	mov	r0, r4
-	ldr	r1, .L30+4
+	ldr	r1, .L38+4
 	bl	fopen
 	subs	r6, r0, #0
-	bne	.L20
-	ldr	r0, .L30+8
+	bne	.L28
+	ldr	r0, .L38+8
 	bl	perror
-.L20:
+.L28:
 	mov	r0, r6
 	mov	r1, #54
 	mov	r2, #0
 	bl	fseek
 	cmp	r0, #0
-	beq	.L21
-	ldr	r0, .L30+12
+	beq	.L29
+	ldr	r0, .L38+12
 	bl	perror
-.L21:
+.L29:
 	mov	r0, r6
 	mov	r1, #1024
 	mov	r2, #1
 	bl	fseek
 	cmp	r0, #0
-	beq	.L22
-	ldr	r0, .L30+16
+	beq	.L30
+	ldr	r0, .L38+16
 	bl	perror
-	b	.L22
-.L24:
+	b	.L30
+.L32:
 	mov	r0, r6
 	bl	fgetc
 	cmn	r0, #1
-	beq	.L23
+	beq	.L31
 	str	r0, [r5], #4
 	add	r4, r4, #1
 	cmp	r4, #320
-	bne	.L24
-.L23:
+	bne	.L32
+.L31:
 	add	r7, r7, #1
 	cmp	r7, #240
 	ldmeqfd	sp!, {r4, r5, r6, r7, r8, r9, sl, pc}
-.L25:
+.L33:
 	mov	r3, r7, asl #8
 	mov	r2, r7, asl #10
 	add	r3, r3, r2
 	add	r5, r8, r3
 	mov	r4, sl
-	b	.L24
-.L22:
-	mov	r7, #0
-	ldr	r8, .L30+20
-	mov	sl, r7
-	b	.L25
-.L31:
-	.align	2
+	b	.L32
 .L30:
+	mov	r7, #0
+	ldr	r8, .L38+20
+	mov	sl, r7
+	b	.L33
+.L39:
+	.align	2
+.L38:
 	.word	stdout
 	.word	.LC0
 	.word	.LC1
@@ -305,84 +360,84 @@ main:
 	sub	sp, sp, #276
 	mov	r3, r0
 	cmp	r0, #2
-	beq	.L33
-	ldr	r0, .L56
+	beq	.L41
+	ldr	r0, .L64
 	sub	r1, r3, #1
 	bl	printf
 	mov	r0, #1
-	b	.L34
-.L33:
+	b	.L42
+.L41:
 	mov	r4, r1
-	ldr	r0, .L56+4
+	ldr	r0, .L64+4
 	ldr	r1, [r4, #4]!
 	bl	printf
-	ldr	r0, .L56+8
+	ldr	r0, .L64+8
 	bl	puts
 	ldr	r0, [r4, #0]
 	bl	get_image
 	mov	r5, #0
-	ldr	r8, .L56+12
-	ldr	r9, .L56+16
+	ldr	r8, .L64+12
+	ldr	r9, .L64+16
 	add	r3, r8, #32
-	ldr	fp, .L56+20
+	ldr	fp, .L64+20
 	add	sl, sp, #16
 	str	r3, [sp, #8]
 	str	r5, [sp, #4]
-	b	.L35
-.L40:
+	b	.L43
+.L48:
 	mov	r6, r7
 	ldr	r0, [sp, #12]
 	mov	r1, r7
 	bl	get_next_group
 	mov	r4, r8
-.L36:
+.L44:
 	mov	r0, r4
 	bl	loefflers
 	add	r4, r4, #32
 	cmp	r4, r9
-	bne	.L36
+	bne	.L44
 	mov	r0, r8
 	mov	r1, sl
 	bl	transpose
 	mov	r4, sl
-.L37:
+.L45:
 	mov	r0, r4
 	bl	loefflers
 	add	r4, r4, #32
 	add	r3, sp, #272
 	cmp	r4, r3
-	bne	.L37
+	bne	.L45
 	mov	r0, sl
 	mov	r1, r8
 	bl	transpose
 	ldr	r0, [sp, #8]
 	ldr	ip, [sp, #4]
-	b	.L38
-.L39:
+	b	.L46
+.L47:
 	ldr	r3, [r1], #4
 	str	r3, [r2], #4
 	cmp	r1, r0
-	bne	.L39
+	bne	.L47
 	add	ip, ip, #1
 	add	r0, r0, #32
 	cmp	ip, #8
-	bne	.L38
+	bne	.L46
 	add	r7, r7, #8
 	cmp	r7, #240
-	bne	.L40
+	bne	.L48
 	add	r5, r5, #8
 	cmp	r5, #320
-	bne	.L35
-	ldr	r0, .L56+24
+	bne	.L43
+	ldr	r0, .L64+24
 	bl	puts
 	sub	r5, r5, #320
-	ldr	sl, .L56+20
+	ldr	sl, .L64+20
 	mov	r9, r5
-	ldr	fp, .L56+28
+	ldr	fp, .L64+28
 	mov	r7, #0
-	ldr	r8, .L56+32
-	b	.L41
-.L42:
+	ldr	r8, .L64+32
+	b	.L49
+.L50:
 	ldr	r0, [r6], #4
 	bl	__aeabi_i2d
 	mov	r2, r7
@@ -394,23 +449,23 @@ main:
 	bl	printf
 	add	r4, r4, #1
 	cmp	r4, #8
-	bne	.L42
+	bne	.L50
 	mov	r0, #10
 	bl	putchar
 	add	r5, r5, #1
 	cmp	r5, #8
-	bne	.L41
-	ldr	r0, .L56+36
+	bne	.L49
+	ldr	r0, .L64+36
 	bl	puts
-	ldr	r6, .L56+40
+	ldr	r6, .L64+40
 	add	r5, r5, #112
-	ldr	sl, .L56+20
-	ldr	r9, .L56+28
+	ldr	sl, .L64+20
+	ldr	r9, .L64+28
 	mov	r7, #0
-	ldr	r8, .L56+32
+	ldr	r8, .L64+32
 	mov	fp, #10
-	b	.L43
-.L44:
+	b	.L51
+.L52:
 	ldr	r0, [r4], #4
 	bl	__aeabi_i2d
 	mov	r2, r7
@@ -421,32 +476,32 @@ main:
 	mov	r0, r9
 	bl	printf
 	cmp	r4, r6
-	bne	.L44
+	bne	.L52
 	mov	r0, fp
 	bl	putchar
 	add	r5, r5, #1
 	add	r6, r6, #1280
 	cmp	r5, #128
-	bne	.L43
+	bne	.L51
 	mov	r0, #0
-.L34:
+.L42:
 	add	sp, sp, #276
 	ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
-.L43:
+.L51:
 	mov	r3, r5, asl #8
 	mov	r2, r5, asl #10
 	add	r3, r3, r2
 	add	r3, r3, #640
 	add	r4, sl, r3
-	b	.L44
-.L41:
+	b	.L52
+.L49:
 	mov	r3, r5, asl #8
 	mov	r2, r5, asl #10
 	add	r3, r3, r2
 	add	r6, sl, r3
 	mov	r4, r9
-	b	.L42
-.L38:
+	b	.L50
+.L46:
 	mov	r3, ip, asl #5
 	add	r1, r8, r3
 	add	r2, ip, r5
@@ -456,14 +511,14 @@ main:
 	add	r3, r3, r6
 	mov	r3, r3, asl #2
 	add	r2, fp, r3
-	b	.L39
-.L35:
+	b	.L47
+.L43:
 	str	r5, [sp, #12]
 	mov	r7, #0
-	b	.L40
-.L57:
+	b	.L48
+.L65:
 	.align	2
-.L56:
+.L64:
 	.word	.LC4
 	.word	.LC5
 	.word	.LC6
@@ -489,6 +544,25 @@ main:
 	.comm	g_current_group,256,4
 	.section	.rodata
 	.align	2
+.LANCHOR0 = . + 0
+	.type	ROTATE_CONST, %object
+	.size	ROTATE_CONST, 12
+ROTATE_CONST:
+	.word	16069
+	.word	13622
+	.word	8866
+	.type	ROTATE_CONST_O1, %object
+	.size	ROTATE_CONST_O1, 12
+ROTATE_CONST_O1:
+	.word	-12873
+	.word	-4520
+	.word	12539
+	.type	ROTATE_CONST_O2, %object
+	.size	ROTATE_CONST_O2, 12
+ROTATE_CONST_O2:
+	.word	-19266
+	.word	-22725
+	.word	-30273
 	.type	IMAGE_SIZE, %object
 	.size	IMAGE_SIZE, 4
 IMAGE_SIZE:
@@ -505,24 +579,6 @@ IMAGE_WIDTH:
 	.size	SQRT2, 4
 SQRT2:
 	.word	181
-	.type	ROTATE_CONST_O1, %object
-	.size	ROTATE_CONST_O1, 12
-ROTATE_CONST_O1:
-	.word	-12873
-	.word	-4520
-	.word	12539
-	.type	ROTATE_CONST_O2, %object
-	.size	ROTATE_CONST_O2, 12
-ROTATE_CONST_O2:
-	.word	-19266
-	.word	-22725
-	.word	-30273
-	.type	ROTATE_CONST, %object
-	.size	ROTATE_CONST, 12
-ROTATE_CONST:
-	.word	16069
-	.word	13622
-	.word	8866
 	.type	END_SCALE, %object
 	.size	END_SCALE, 4
 END_SCALE:
