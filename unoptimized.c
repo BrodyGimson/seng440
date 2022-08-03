@@ -21,8 +21,8 @@ int const IMAGE_WIDTH = 320;
 
 // Constants used in Loeffler's Algorithm
 int const SQRT2 = 181;
-int const ROTATE_CONST_p_output_1[3] = {-12873, -4520, 12539};      // Constants used for output 1 in rotators
-int const ROTATE_CONST_p_output_2[3] = {-19266, -22725, -30273};    // Constants used for output 2 in rotators
+int const ROTATE_CONST_O1[3] = {-12873, -4520, 12539};      // Constants used for output 1 in rotators
+int const ROTATE_CONST_O2[3] = {-19266, -22725, -30273};    // Constants used for output 2 in rotators
 int const ROTATE_CONST[3] = {16069, 13622, 8866};                   // Constants used for both in rotators
 int const END_SCALE = 16384;                                        // Ending scale factor
 
@@ -114,8 +114,8 @@ void reflector(int32_t input_1, int32_t input_2, int32_t *p_output_1, int32_t *p
 void rotator(int32_t input_1, int32_t input_2, int c, int32_t *p_output_1, int32_t *p_output_2)
 {
     // Barr-C: Don't rely on C's operation precedence rules, use parentheses (1.4.a)
-    p_output_1[0] = (ROTATE_CONST_p_output_1[c] * input_2) + (ROTATE_CONST[c] * (input_1 + input_2));
-    p_output_2[0] = (ROTATE_CONST_p_output_2[c] * input_1) + (ROTATE_CONST[c] * (input_1 + input_2));
+    p_output_1[0] = (ROTATE_CONST_O1[c] * input_2) + (ROTATE_CONST[c] * (input_1 + input_2));
+    p_output_2[0] = (ROTATE_CONST_O2[c] * input_1) + (ROTATE_CONST[c] * (input_1 + input_2));
 }
 
 int32_t scale_up(int32_t input)
