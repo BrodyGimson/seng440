@@ -127,7 +127,7 @@ int32_t scale_up(int32_t input)
     return output;
 }
 
-void loefflers(int32_t * x)
+inline void loefflers(int32_t * x)
 {
     int32_t tmp_output[8];
     
