@@ -21,8 +21,8 @@ int const IMAGE_WIDTH = 320;
 
 // Constants used in Loeffler's Algorithm
 int const SQRT2 = 181;
-int const ROTATE_CONST_p_output_1[3] = {-12873, -4520, 12539};      // Constants used for output 1 in rotators
-int const ROTATE_CONST_p_output_2[3] = {-19266, -22725, -30273};    // Constants used for output 2 in rotators
+int const ROTATE_CONST_O1[3] = {-12873, -4520, 12539};      // Constants used for output 1 in rotators
+int const ROTATE_CONST_O2[3] = {-19266, -22725, -30273};    // Constants used for output 2 in rotators
 int const ROTATE_CONST[3] = {16069, 13622, 8866};                   // Constants used for both in rotators
 int const END_SCALE = 16384;                                        // Ending scale factor
 
@@ -105,6 +105,7 @@ void get_next_group(int current_x, int current_y)
     }
 }
 
+/*
 void reflector(int32_t input_1, int32_t input_2, int32_t *p_output_1, int32_t *p_output_2)
 {       
     p_output_1[0] = input_1 + input_2;
@@ -114,9 +115,10 @@ void reflector(int32_t input_1, int32_t input_2, int32_t *p_output_1, int32_t *p
 void rotator(int32_t input_1, int32_t input_2, int c, int32_t *p_output_1, int32_t *p_output_2)
 {
     // Barr-C: Don't rely on C's operation precedence rules, use parentheses (1.4.a)
-    p_output_1[0] = (ROTATE_CONST_p_output_1[c] * input_2) + (ROTATE_CONST[c] * (input_1 + input_2));
-    p_output_2[0] = (ROTATE_CONST_p_output_2[c] * input_1) + (ROTATE_CONST[c] * (input_1 + input_2));
+    p_output_1[0] = (ROTATE_CONST_O1[c] * input_2) + (ROTATE_CONST[c] * (input_1 + input_2));
+    p_output_2[0] = (ROTATE_CONST_O2[c] * input_1) + (ROTATE_CONST[c] * (input_1 + input_2));
 }
+*/
 
 int32_t scale_up(int32_t input)
 {
@@ -129,48 +131,133 @@ int32_t scale_up(int32_t input)
 
 void loefflers(int32_t * x)
 {
-    int32_t tmp_output[8];
+    int32_t local_x0 = x[0];
+    int32_t local_x1 = x[1];
+    int32_t local_x2 = x[2];
+    int32_t local_x3 = x[3];
+    int32_t local_x4 = x[4];
+    int32_t local_x5 = x[5];
+    int32_t local_x6 = x[6];
+    int32_t local_x7 = x[7];
+
+    int32_t tmp0;
+    int32_t tmp1;
+    int32_t tmp2;
+    int32_t tmp3;
+    int32_t tmp4;
+    int32_t tmp5;
+    int32_t tmp6;
+    int32_t tmp7;
     
     //stage 1
+    tmp0 = local_x0 + local_x7;
+    tmp1 = local_x1 + local_x6;
+    tmp2 = local_x2 + local_x5;
+    tmp3 = local_x3 + local_x4;
+    tmp4 = local_x3 - local_x4;
+    tmp5 = local_x2 - local_x5;
+    tmp6 = local_x1 - local_x6;
+    tmp7 = local_x0 - local_x7;
+
+    /*
     reflector(x[0], x[7], &tmp_output[0], &tmp_output[7]);
     reflector(x[1], x[6], &tmp_output[1], &tmp_output[6]);
     reflector(x[2], x[5], &tmp_output[2], &tmp_output[5]);
     reflector(x[3], x[4], &tmp_output[3], &tmp_output[4]);
+    */
     
     // Even numbers
+    local_x0 = tmp0;
+    local_x1 = tmp1;
+    local_x2 = tmp2;
+    local_x3 = tmp3;
     //stage 2 
+    tmp0 = local_x0 + local_x3;
+    tmp3 = local_x0 - local_x3;
+    tmp1 = local_x1 + local_x2;
+    tmp2 = local_x1 - local_x2;
+
+    /*
     reflector(tmp_output[0], tmp_output[3], &tmp_output[0], &tmp_output[3]);
     reflector(tmp_output[1], tmp_output[2], &tmp_output[1], &tmp_output[2]);
-    
+    */
+    local_x0 = tmp0;
+    local_x1 = tmp1;
+    local_x2 = tmp2;
+    local_x3 = tmp3;
+
     //stage 3
+    tmp0 = local_x0 + local_x1;
+    tmp1 = local_x0 - local_x1;
+
+    tmp2 = (ROTATE_CONST_O1[2] * local_x3) + (ROTATE_CONST[2] * (local_x2 + local_x3));
+    tmp3 = (ROTATE_CONST_O2[2] * local_x2) + (ROTATE_CONST[2] * (local_x2 + local_x3));
+
+    /*
     reflector(tmp_output[0], tmp_output[1], &tmp_output[0], &tmp_output[1]);
     rotator(tmp_output[2], tmp_output[3], 2, &tmp_output[2], &tmp_output[3]);
+    */
 
     // unscramble values
-    x[0] = tmp_output[0] << 7;
-    x[4] = tmp_output[1] << 7;
-    x[2] = tmp_output[2] >> 7;
-    x[6] = tmp_output[3] >> 7;
+    x[0] = tmp0 << 7;
+    x[4] = tmp1 << 7;
+    x[2] = tmp2 >> 7;
+    x[6] = tmp3 >> 7;
     
     // Odd numbers
+    local_x4 = tmp4;
+    local_x5 = tmp5;
+    local_x6 = tmp6;
+    local_x7 = tmp7;
     // stage 2
+    tmp4 = (ROTATE_CONST_O1[1] * local_x7) + (ROTATE_CONST[1] * (local_x7 + local_x4));
+    tmp7 = (ROTATE_CONST_O2[1] * local_x4) + (ROTATE_CONST[1] * (local_x7 + local_x4));
+
+    tmp5 = (ROTATE_CONST_O1[0] * local_x6) + (ROTATE_CONST[0] * (local_x5 + local_x6));
+    tmp6 = (ROTATE_CONST_O2[0] * local_x5) + (ROTATE_CONST[0] * (local_x5 + local_x6));
+
+    /*
     rotator(tmp_output[4], tmp_output[7], 1, &tmp_output[4], &tmp_output[7]);
     rotator(tmp_output[5], tmp_output[6], 0, &tmp_output[5], &tmp_output[6]);
+    */
 
     // stage 3
+    local_x4 = tmp4;
+    local_x5 = tmp5;
+    local_x6 = tmp6;
+    local_x7 = tmp7;
+
+    /*
     reflector(tmp_output[4], tmp_output[6], &tmp_output[4], &tmp_output[6]);
     reflector(tmp_output[7], tmp_output[5], &tmp_output[7], &tmp_output[5]);
+    */
+
+    tmp4 = local_x4 + local_x6;
+    tmp6 = local_x4 - local_x6;
+
+    tmp7 = local_x7 + local_x5;
+    tmp5 = local_x7 - local_x5;
 
     //stage 4
+    local_x4 = tmp4;
+    local_x5 = tmp5;
+    local_x6 = tmp6;
+    local_x7 = tmp7;
+
+    /*
     reflector(tmp_output[7], tmp_output[4], &tmp_output[7], &tmp_output[4]);
-    tmp_output[5] = scale_up(tmp_output[5]);
-    tmp_output[6] = scale_up(tmp_output[6]);  
+    */
+    tmp7 = local_x7 + local_x4;
+    tmp4 = local_x7 - local_x4;
+
+    tmp5 = scale_up(local_x5);
+    tmp6 = scale_up(local_x6);  
     
     // unscramble values
-    x[7] = tmp_output[4] >> 7;
-    x[3] = tmp_output[5] >> 7;
-    x[5] = tmp_output[6] >> 7;
-    x[1] = tmp_output[7] >> 7;
+    x[7] = tmp4 >> 7;
+    x[3] = tmp5 >> 7;
+    x[5] = tmp6 >> 7;
+    x[1] = tmp7 >> 7;
 }
 
 int main(int argc, char *argv[])
