@@ -32,7 +32,7 @@ int32_t g_pixel_matrix[240][320];
 int32_t g_output_matrix[240][320];
 int32_t g_current_group[8][8];
 
-void getImage(char *p_image_name) 
+void get_image(char *p_image_name) 
 {
     // Barr-C: Pointers should start with "p_" (7.1.k)
     // Barr-C: variables initialized before use (7.2.a)
@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
 
     printf("\n----TESTING AREA----\n");
 
-    getImage(argv[1]);
+    get_image(argv[1]);
     
     start_ticks = clock();
 
