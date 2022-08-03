@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
 
     printf("\n----TESTING AREA----\n");
 
-    for (int c = 0; c < 1000; c++) 
+    for (int c = 0; c < 100; c++) 
     {
         get_image(argv[1]);
 
