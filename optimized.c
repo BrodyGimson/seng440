@@ -105,7 +105,7 @@ void get_next_group(int current_x, int current_y)
     }
 }
 
-void * reflector(int32_t input_1, int32_t input_2, int32_t *p_output_1, int32_t *p_output_2)
+void reflector(int32_t input_1, int32_t input_2, int32_t *p_output_1, int32_t *p_output_2)
 {       
     p_output_1[0] = input_1 + input_2;
     p_output_2[0] = input_1 - input_2;
@@ -127,7 +127,7 @@ int32_t scale_up(int32_t input)
     return output;
 }
 
-void * loefflers(int32_t * x)
+void loefflers(int32_t * x)
 {
     int32_t tmp_output[8];
     
