@@ -6,7 +6,7 @@
 	.eabi_attribute 24, 1
 	.eabi_attribute 25, 1
 	.eabi_attribute 26, 2
-	.eabi_attribute 30, 1
+	.eabi_attribute 30, 2
 	.eabi_attribute 18, 4
 	.file	"optimized.c"
 	.text
@@ -17,12 +17,13 @@ transpose:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	@ link register save eliminated.
-	stmfd	sp!, {r4, r5, r6}
-	mov	r5, r0
-	mov	r4, r1
+	str	r4, [sp, #-4]!
+	mov	r4, r0
 	mov	r0, #0
-	mov	r6, r0
-	b	.L2
+.L2:
+	mov	r3, r0, asl #2
+	add	ip, r4, r3
+	mov	r2, #0
 .L3:
 	ldr	r3, [ip], #32
 	str	r3, [r1, r2]
@@ -30,17 +31,10 @@ transpose:
 	cmp	r2, #32
 	bne	.L3
 	add	r0, r0, #1
-	add	r4, r4, #32
 	cmp	r0, #8
-	beq	.L7
-.L2:
-	mov	r1, r4
-	mov	r3, r0, asl #2
-	add	ip, r5, r3
-	mov	r2, r6
-	b	.L3
-.L7:
-	ldmfd	sp!, {r4, r5, r6}
+	add	r1, r1, #32
+	bne	.L2
+	ldmfd	sp!, {r4}
 	bx	lr
 	.size	transpose, .-transpose
 	.align	2
@@ -51,40 +45,36 @@ get_next_group:
 	@ frame_needed = 0, uses_anonymous_args = 0
 	@ link register save eliminated.
 	stmfd	sp!, {r4, r5, r6, r7}
+	ldr	r7, .L14
+	ldr	r6, .L14+4
 	mov	r5, r0
 	mov	r4, r1
-	ldr	r1, .L15
 	mov	r0, #0
-	ldr	r7, .L15+4
-	ldr	r6, .L15+8
-	b	.L9
-.L10:
-	ldr	r3, [ip], #4
-	str	r3, [r2], #4
-	cmp	r1, r2
-	bne	.L10
-	add	r0, r0, #1
-	add	r1, r1, #32
-	cmp	r0, #8
-	beq	.L14
 .L9:
 	add	r3, r0, r4
-	mov	r2, r3, asl #6
-	mov	r3, r3, asl #8
-	add	r2, r2, r3
-	add	r2, r2, r5
-	mov	r2, r2, asl #2
-	add	ip, r7, r2
-	mov	r3, r0, asl #5
-	add	r2, r6, r3
-	b	.L10
-.L14:
+	mov	r2, r3, asl #8
+	mov	r3, r3, asl #6
+	add	r3, r3, r2
+	add	r3, r3, r5
+	mov	r2, r0, asl #5
+	mov	r3, r3, asl #2
+	add	ip, r6, r2
+	add	r1, r7, r3
+	mov	r2, #0
+.L10:
+	add	r2, r2, #1
+	ldr	r3, [r1], #4
+	cmp	r2, #8
+	str	r3, [ip], #4
+	bne	.L10
+	add	r0, r0, #1
+	cmp	r0, #8
+	bne	.L9
 	ldmfd	sp!, {r4, r5, r6, r7}
 	bx	lr
-.L16:
-	.align	2
 .L15:
-	.word	g_current_group+32
+	.align	2
+.L14:
 	.word	g_pixel_matrix
 	.word	g_current_group
 	.size	get_next_group, .-get_next_group
@@ -92,174 +82,189 @@ get_next_group:
 	.global	loefflers
 	.type	loefflers, %function
 loefflers:
-	@ args = 0, pretend = 0, frame = 32
+	@ args = 0, pretend = 0, frame = 48
 	@ frame_needed = 0, uses_anonymous_args = 0
 	@ link register save eliminated.
 	stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp}
-	sub	sp, sp, #32
-	ldr	r6, [r0, #0]
-	str	r0, [sp, #0]
-	mov	r3, r0
-	ldr	r2, [r3, #4]!
-	str	r3, [sp, #0]
-	str	r2, [sp, #24]
-	str	r0, [sp, #4]
-	mov	r5, r0
-	ldr	r9, [r5, #8]!
-	str	r5, [sp, #4]
-	str	r0, [sp, #8]
-	mov	r2, r0
-	ldr	r8, [r2, #12]!
-	str	r2, [sp, #8]
-	str	r0, [sp, #12]
-	mov	r3, r0
-	ldr	sl, [r3, #16]!
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #16]
+	ldr	r8, [r0, #8]
+	rsb	sl, r2, r1
+	ldr	r1, [r0, #20]
+	sub	sp, sp, #48
+	ldr	r3, [r0, #0]
+	ldr	r4, [r0, #28]
+	rsb	r8, r1, r8
+	str	r8, [sp, #40]
+	ldr	fp, [r0, #24]
+	ldr	r2, [r0, #4]
+	rsb	r9, r4, r3
+	ldr	r4, [sp, #40]
+	rsb	r8, fp, r2
+	add	r3, r9, sl
+	add	r4, r8, r4
+	str	r4, [sp, #8]
 	str	r3, [sp, #12]
-	str	r0, [sp, #16]
-	mov	r2, r0
-	ldr	r5, [r2, #20]!
-	str	r2, [sp, #16]
-	mov	fp, r0
-	ldr	r1, [fp, #24]!
-	str	r0, [sp, #20]
-	mov	r3, r0
-	ldr	r2, [r3, #28]!
-	str	r3, [sp, #20]
-	add	ip, r2, r6
-	ldr	r3, [sp, #24]
-	add	r4, r1, r3
-	add	r7, r5, r9
-	add	r3, sl, r8
-	rsb	r8, sl, r8
-	rsb	r9, r5, r9
-	ldr	r5, [sp, #24]
-	rsb	r1, r1, r5
-	str	r1, [sp, #28]
-	rsb	r6, r2, r6
-	add	r5, r3, ip
-	rsb	ip, r3, ip
-	add	sl, r7, r4
-	rsb	r4, r7, r4
-	add	r2, r4, ip
+	mov	r2, sl, asl #4
+	mov	r4, sl, asl #2
+	add	r4, r4, r2
+	ldr	r2, [sp, #12]
+	mov	r5, r3, asl #4
+	mov	r1, r8, asl #2
+	mov	r3, r8, asl #5
+	add	r1, r1, r3
+	sub	r5, r5, r2, asl #2
+	ldr	r3, [sp, #8]
+	ldr	r2, [sp, #40]
+	mov	ip, r3, asl #8
+	mov	r7, r2, asl #2
 	mov	r3, r2, asl #4
-	mov	r1, r2, asl #7
-	add	r3, r3, r1
-	rsb	r3, r2, r3
-	mov	r1, r3, asl #5
-	rsb	r1, r3, r1
-	mov	r1, r1, asl #1
-	mov	r3, ip, asl #9
-	sub	r3, r3, ip, asl #6
-	mov	r2, r3, asl #3
-	rsb	r2, r3, r2
-	rsb	r2, ip, r2
-	mov	r2, r2, asl #2
-	rsb	r2, ip, r2
-	add	r2, r1, r2
-	mov	r3, r4, asl #6
-	sub	r3, r3, r4, asl #2
-	rsb	r3, r4, r3
-	mov	r3, r3, asl #3
-	add	r3, r3, r4
-	mov	r3, r3, asl #6
-	add	r3, r3, r4
-	rsb	r1, r3, r1
-	add	r3, sl, r5
-	mov	r3, r3, asl #7
-	str	r3, [r0, #0]
-	rsb	r5, sl, r5
-	mov	r5, r5, asl #7
-	ldr	r0, [sp, #12]
-	str	r5, [r0, #0]
-	mov	r2, r2, asr #7
-	ldr	r3, [sp, #4]
-	str	r2, [r3, #0]
-	mov	r1, r1, asr #7
-	str	r1, [fp, #0]
-	add	r2, r6, r8
-	mov	ip, r2, asl #4
-	sub	ip, ip, r2, asl #2
-	add	ip, ip, r2
-	mov	ip, ip, asl #2
-	add	ip, ip, r2
-	mov	r3, ip, asl #8
-	add	ip, ip, r3
-	add	ip, ip, r2
-	mov	r4, r6, asl #7
-	sub	r4, r4, r6, asl #4
-	add	r4, r4, r6
+	add	r7, r7, r3
+	ldr	r3, [sp, #12]
+	ldr	r2, [sp, #8]
+	add	r5, r5, r3
 	mov	r3, r4, asl #2
 	add	r4, r4, r3
-	sub	r4, ip, r4, asl #3
-	mov	r2, r8, asl #2
-	mov	r3, r8, asl #4
-	add	r2, r2, r3
-	mov	r3, r2, asl #2
-	add	r2, r2, r3
-	add	r2, r2, r8
-	mov	r3, r2, asl #4
-	rsb	r3, r2, r3
-	sub	r3, r3, r3, asl #4
-	add	ip, ip, r3
-	ldr	r5, [sp, #28]
-	add	r3, r5, r9
-	mov	r1, r3, asl #8
-	sub	r1, r1, r3, asl #2
-	rsb	r1, r3, r1
-	mov	r1, r1, asl #4
-	add	r1, r1, r3
-	mov	r1, r1, asl #2
-	add	r1, r1, r3
-	mov	r3, r5, asl #2
-	mov	r2, r5, asl #5
-	add	r3, r3, r2
-	mov	r2, r3, asl #4
-	add	r3, r3, r2
-	add	r3, r3, r5
-	mov	r0, r3, asl #2
-	rsb	r0, r3, r0
-	sub	r0, r0, r0, asl #3
-	add	r0, r1, r0
-	mov	r2, r9, asl #2
-	mov	r3, r9, asl #4
-	add	r2, r2, r3
-	mov	r3, r2, asl #4
-	rsb	r3, r2, r3
+	ldr	r3, [sp, #8]
+	sub	ip, ip, r2, asl #2
+	mov	r2, r1, asl #4
+	add	r1, r1, r2
+	rsb	ip, r3, ip
+	mov	r3, r9, asl #7
+	add	r4, r4, sl
+	add	r1, r1, r8
+	sub	r3, r3, r9, asl #4
+	ldr	r8, [sp, #12]
 	add	r3, r3, r9
-	mov	r3, r3, asl #5
-	add	r3, r3, r9
-	sub	r1, r1, r3, asl #1
-	add	r6, r1, r4
-	add	r5, r0, ip
-	rsb	ip, r0, ip
+	mov	r5, r5, asl #2
+	mov	r9, r4, asl #4
+	add	r5, r5, r8
+	ldr	sl, [sp, #8]
+	ldr	r8, [r0, #0]
+	rsb	r9, r4, r9
+	ldr	r4, [r0, #28]
+	ldr	r2, [sp, #40]
+	mov	r6, r7, asl #4
+	mov	ip, ip, asl #4
+	add	r4, r4, r8
+	rsb	r6, r7, r6
+	add	ip, ip, sl
+	ldr	sl, [r0, #4]
+	str	r4, [sp, #24]
+	ldr	r8, [r0, #12]
+	add	r6, r6, r2
+	mov	r7, r1, asl #2
+	mov	r2, r5, asl #8
+	ldr	r4, [r0, #16]
+	add	fp, fp, sl
+	add	r5, r5, r2
+	rsb	r7, r1, r7
+	ldr	r2, [r0, #8]
+	ldr	r1, [r0, #20]
+	ldr	sl, [sp, #24]
+	add	r4, r4, r8
+	rsb	sl, r4, sl
+	add	r1, r1, r2
+	str	fp, [sp, #28]
+	str	r1, [sp, #32]
+	rsb	fp, r1, fp
+	str	r4, [sp, #36]
+	str	sl, [sp, #44]
+	ldr	r1, [sp, #12]
+	ldr	r4, [sp, #8]
+	ldr	r8, [sp, #40]
+	mov	r2, r3, asl #2
+	mov	ip, ip, asl #2
+	mov	r6, r6, asl #5
+	add	r5, r5, r1
+	add	ip, ip, r4
+	add	r3, r3, r2
+	add	r6, r6, r8
+	sub	r9, r9, r9, asl #4
+	add	r9, r5, r9
+	sub	r6, ip, r6, asl #1
+	sub	r5, r5, r3, asl #3
+	ldr	r3, [sp, #44]
+	add	r8, fp, sl
+	mov	r1, sl, asl #9
+	rsb	sl, r6, r5
+	sub	r1, r1, r3, asl #6
+	mov	r2, fp, asl #6
+	mov	r3, r8, asl #7
+	mov	r4, r8, asl #4
+	mov	sl, sl, asr #7
+	str	sl, [sp, #20]
+	sub	r2, r2, fp, asl #2
+	add	r4, r4, r3
+	mov	r3, r1, asl #3
+	sub	r7, r7, r7, asl #3
+	rsb	r2, fp, r2
+	rsb	r3, r1, r3
+	ldr	r1, [sp, #20]
+	add	ip, ip, r7
+	mov	r2, r2, asl #3
+	mov	sl, sl, asl #4
+	sub	sl, sl, r1, asl #2
+	rsb	r7, ip, r9
+	ldr	r1, [sp, #44]
+	add	r2, r2, fp
+	mov	r7, r7, asr #7
+	mov	r2, r2, asl #6
+	rsb	r4, r8, r4
+	rsb	r3, r1, r3
+	mov	r8, r7, asl #4
+	str	r2, [sp, #0]
+	ldr	r2, [sp, #44]
+	sub	r8, r8, r7, asl #2
+	mov	r1, r4, asl #5
+	mov	r3, r3, asl #2
+	rsb	r3, r2, r3
+	str	r7, [sp, #16]
+	rsb	r1, r4, r1
+	mov	r7, sl, asl #4
+	mov	r4, r8, asl #4
+	str	r3, [sp, #4]
+	rsb	r4, r8, r4
+	ldr	r3, [sp, #0]
+	rsb	r7, sl, r7
+	ldr	r8, [sp, #36]
+	ldr	sl, [sp, #24]
+	add	r2, r3, fp
+	add	fp, r8, sl
+	ldr	r3, [sp, #32]
+	ldr	r8, [sp, #28]
+	add	ip, ip, r9
+	add	sl, r3, r8
+	ldr	r3, [sp, #16]
+	mov	r1, r1, asl #1
+	add	r4, r4, r3
+	ldr	r3, [sp, #20]
+	add	r6, r6, r5
+	add	r7, r7, r3
+	ldr	r3, [sp, #4]
+	rsb	r2, r2, r1
+	add	r5, ip, r6
+	rsb	r8, sl, fp
+	add	r1, r1, r3
+	add	r9, sl, fp
+	rsb	ip, r6, ip
+	mov	r9, r9, asl #7
+	mov	r8, r8, asl #7
+	mov	r1, r1, asr #7
+	mov	r2, r2, asr #7
 	mov	ip, ip, asr #7
-	rsb	r4, r1, r4
 	mov	r4, r4, asr #7
-	rsb	r3, r6, r5
-	mov	r3, r3, asr #7
-	ldr	r0, [sp, #20]
-	str	r3, [r0, #0]
-	mov	r2, ip, asl #4
-	sub	r2, r2, ip, asl #2
-	mov	r3, r2, asl #4
-	rsb	r3, r2, r3
-	add	r3, r3, ip
-	mov	r3, r3, asr #7
-	ldr	r2, [sp, #8]
-	str	r3, [r2, #0]
-	mov	r2, r4, asl #4
-	sub	r2, r2, r4, asl #2
-	mov	r3, r2, asl #4
-	rsb	r3, r2, r3
-	add	r3, r3, r4
-	mov	r3, r3, asr #7
-	ldr	r0, [sp, #16]
-	str	r3, [r0, #0]
-	add	r5, r5, r6
+	mov	r7, r7, asr #7
 	mov	r5, r5, asr #7
-	ldr	r2, [sp, #0]
-	str	r5, [r2, #0]
-	add	sp, sp, #32
+	str	r5, [r0, #4]
+	str	r9, [r0, #0]
+	str	r8, [r0, #16]
+	str	r1, [r0, #8]
+	str	r2, [r0, #24]
+	str	ip, [r0, #28]
+	str	r4, [r0, #12]
+	str	r7, [r0, #20]
+	add	sp, sp, #48
 	ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp}
 	bx	lr
 	.size	loefflers, .-loefflers
@@ -269,71 +274,72 @@ loefflers:
 get_image:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
-	mov	r4, r0
 	ldr	r3, .L30
+	stmfd	sp!, {r4, r5, r6, r7, r8, lr}
+	mov	r4, r0
 	ldr	r0, [r3, #0]
 	bl	fflush
 	mov	r0, r4
 	ldr	r1, .L30+4
 	bl	fopen
 	subs	r6, r0, #0
-	bne	.L20
+	beq	.L28
+.L19:
+	mov	r0, r6
+	mov	r1, #54
+	mov	r2, #0
+	bl	fseek
+	cmp	r0, #0
+	beq	.L20
 	ldr	r0, .L30+8
 	bl	perror
 .L20:
 	mov	r0, r6
-	mov	r1, #54
-	mov	r2, #0
+	mov	r1, #1024
+	mov	r2, #1
 	bl	fseek
 	cmp	r0, #0
 	beq	.L21
 	ldr	r0, .L30+12
 	bl	perror
 .L21:
-	mov	r0, r6
-	mov	r1, #1024
-	mov	r2, #1
-	bl	fseek
-	cmp	r0, #0
-	beq	.L22
-	ldr	r0, .L30+16
-	bl	perror
-	b	.L22
-.L24:
-	mov	r0, r6
-	bl	fgetc
-	cmn	r0, #1
-	beq	.L23
-	str	r0, [r5], #4
-	add	r4, r4, #1
-	cmp	r4, #320
-	bne	.L24
-.L23:
-	add	r7, r7, #1
-	cmp	r7, #240
-	ldmeqfd	sp!, {r4, r5, r6, r7, r8, r9, sl, pc}
-.L25:
+	ldr	r8, .L30+16
+	mov	r7, #0
+.L22:
 	mov	r3, r7, asl #8
 	mov	r2, r7, asl #10
 	add	r3, r3, r2
 	add	r5, r8, r3
-	mov	r4, sl
+	mov	r4, #0
 	b	.L24
-.L22:
-	mov	r7, #0
-	ldr	r8, .L30+20
-	mov	sl, r7
-	b	.L25
+.L29:
+	cmp	r4, #320
+	str	r0, [r5], #4
+	beq	.L23
+.L24:
+	mov	r0, r6
+	bl	fgetc
+	cmn	r0, #1
+	add	r4, r4, #1
+	bne	.L29
+.L23:
+	add	r7, r7, #1
+	cmp	r7, #240
+	bne	.L22
+	ldmfd	sp!, {r4, r5, r6, r7, r8, pc}
+.L28:
+	ldr	r0, .L30+20
+	bl	perror
+	b	.L19
 .L31:
 	.align	2
 .L30:
 	.word	stdout
 	.word	.LC0
-	.word	.LC1
 	.word	.LC2
 	.word	.LC3
 	.word	g_pixel_matrix
+	.word	.LC1
 	.size	get_image, .-get_image
 	.global	__aeabi_i2d
 	.global	__aeabi_dmul
@@ -341,182 +347,205 @@ get_image:
 	.global	main
 	.type	main, %function
 main:
-	@ args = 0, pretend = 0, frame = 272
+	@ args = 0, pretend = 0, frame = 256
 	@ frame_needed = 0, uses_anonymous_args = 0
 	stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
-	sub	sp, sp, #276
-	mov	r3, r0
 	cmp	r0, #2
+	sub	sp, sp, #260
+	mov	r4, r1
 	beq	.L33
-	ldr	r0, .L56
-	sub	r1, r3, #1
+	sub	r1, r0, #1
+	ldr	r0, .L68
 	bl	printf
 	mov	r0, #1
-	b	.L34
-.L33:
-	mov	r4, r1
-	ldr	r0, .L56+4
-	ldr	r1, [r4, #4]!
-	bl	printf
-	ldr	r0, .L56+8
-	bl	puts
-	ldr	r0, [r4, #0]
-	bl	get_image
-	mov	r5, #0
-	ldr	r8, .L56+12
-	ldr	r9, .L56+16
-	add	r3, r8, #32
-	ldr	fp, .L56+20
-	add	sl, sp, #16
-	str	r3, [sp, #8]
-	str	r5, [sp, #4]
-	b	.L35
-.L40:
-	mov	r6, r7
-	ldr	r0, [sp, #12]
-	mov	r1, r7
-	bl	get_next_group
-	mov	r4, r8
-.L36:
-	mov	r0, r4
-	bl	loefflers
-	add	r4, r4, #32
-	cmp	r4, r9
-	bne	.L36
-	mov	r0, r8
-	mov	r1, sl
-	bl	transpose
-	mov	r4, sl
-.L37:
-	mov	r0, r4
-	bl	loefflers
-	add	r4, r4, #32
-	add	r3, sp, #272
-	cmp	r4, r3
-	bne	.L37
-	mov	r0, sl
-	mov	r1, r8
-	bl	transpose
-	ldr	r0, [sp, #8]
-	ldr	ip, [sp, #4]
-	b	.L38
-.L39:
-	ldr	r3, [r1], #4
-	str	r3, [r2], #4
-	cmp	r1, r0
-	bne	.L39
-	add	ip, ip, #1
-	add	r0, r0, #32
-	cmp	ip, #8
-	bne	.L38
-	add	r7, r7, #8
-	cmp	r7, #240
-	bne	.L40
-	add	r5, r5, #8
-	cmp	r5, #320
-	bne	.L35
-	ldr	r0, .L56+24
-	bl	puts
-	sub	r5, r5, #320
-	ldr	sl, .L56+20
-	mov	r9, r5
-	ldr	fp, .L56+28
-	mov	r7, #0
-	ldr	r8, .L56+32
-	b	.L41
-.L42:
-	ldr	r0, [r6], #4
-	bl	__aeabi_i2d
-	mov	r2, r7
-	mov	r3, r8
-	bl	__aeabi_dmul
-	mov	r2, r0
-	mov	r3, r1
-	mov	r0, fp
-	bl	printf
-	add	r4, r4, #1
-	cmp	r4, #8
-	bne	.L42
-	mov	r0, #10
-	bl	putchar
-	add	r5, r5, #1
-	cmp	r5, #8
-	bne	.L41
-	ldr	r0, .L56+36
-	bl	puts
-	ldr	r6, .L56+40
-	add	r5, r5, #112
-	ldr	sl, .L56+20
-	ldr	r9, .L56+28
-	mov	r7, #0
-	ldr	r8, .L56+32
-	mov	fp, #10
-	b	.L43
-.L44:
-	ldr	r0, [r4], #4
-	bl	__aeabi_i2d
-	mov	r2, r7
-	mov	r3, r8
-	bl	__aeabi_dmul
-	mov	r2, r0
-	mov	r3, r1
-	mov	r0, r9
-	bl	printf
-	cmp	r4, r6
-	bne	.L44
-	mov	r0, fp
-	bl	putchar
-	add	r5, r5, #1
-	add	r6, r6, #1280
-	cmp	r5, #128
-	bne	.L43
-	mov	r0, #0
 .L34:
-	add	sp, sp, #276
+	add	sp, sp, #260
 	ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
-.L43:
-	mov	r3, r5, asl #8
-	mov	r2, r5, asl #10
+.L33:
+	ldr	r1, [r1, #4]
+	ldr	r0, .L68+4
+	bl	printf
+	ldr	r0, .L68+8
+	bl	puts
+	ldr	r0, [r4, #4]
+	bl	get_image
+	ldr	r8, .L68+12
+	ldr	fp, .L68+16
+	mov	r7, #0
+	mov	sl, sp
+	mov	r9, r8
+.L35:
+	mov	r6, #0
+.L48:
+	mov	ip, #0
+.L36:
+	add	r3, ip, r6
+	mov	r2, r3, asl #8
+	mov	r3, r3, asl #6
 	add	r3, r3, r2
-	add	r3, r3, #640
-	add	r4, sl, r3
-	b	.L44
+	ldr	r1, .L68+20
+	add	r3, r3, r7
+	mov	r2, ip, asl #5
+	mov	r3, r3, asl #2
+	add	r0, r1, r3
+	add	r1, r8, r2
+	mov	r2, #0
+.L37:
+	add	r2, r2, #1
+	ldr	r3, [r0], #4
+	cmp	r2, #8
+	str	r3, [r1], #4
+	bne	.L37
+	add	ip, ip, #1
+	cmp	ip, #8
+	bne	.L36
+	ldr	r8, .L68+12
+	mov	r5, r8
+	mov	r4, r8
+.L39:
+	mov	r0, r4
+	bl	loefflers
+	ldr	r3, .L68+24
+	add	r4, r4, #32
+	cmp	r4, r3
+	bne	.L39
+	mov	r4, sl
+	mov	r0, sl
+	mov	ip, #0
+.L40:
+	mov	r3, ip, asl #2
+	add	r1, r9, r3
+	mov	r2, #0
 .L41:
-	mov	r3, r5, asl #8
-	mov	r2, r5, asl #10
-	add	r3, r3, r2
-	add	r6, sl, r3
-	mov	r4, r9
-	b	.L42
-.L38:
-	mov	r3, ip, asl #5
-	add	r1, r8, r3
-	add	r2, ip, r5
-	mov	r3, r2, asl #6
-	mov	r2, r2, asl #8
+	ldr	r3, [r1], #32
+	str	r3, [r0, r2]
+	add	r2, r2, #4
+	cmp	r2, #32
+	bne	.L41
+	add	ip, ip, #1
+	cmp	ip, #8
+	add	r0, r0, #32
+	bne	.L40
+.L57:
+	mov	r0, r4
+	bl	loefflers
+	add	r4, r4, #32
+	add	r1, sp, #256
+	cmp	r4, r1
+	bne	.L57
+	mov	r0, #0
+.L43:
+	mov	r3, r0, asl #2
+	add	r1, sl, r3
+	mov	r2, #0
+.L44:
+	ldr	r3, [r1], #32
+	str	r3, [r5, r2]
+	add	r2, r2, #4
+	cmp	r2, #32
+	bne	.L44
+	add	r0, r0, #1
+	cmp	r0, #8
+	add	r5, r5, #32
+	bne	.L43
+	mov	ip, #0
+.L45:
+	add	r3, ip, r7
+	mov	r2, r3, asl #8
+	mov	r3, r3, asl #6
 	add	r3, r3, r2
 	add	r3, r3, r6
+	mov	r2, ip, asl #5
 	mov	r3, r3, asl #2
-	add	r2, fp, r3
-	b	.L39
-.L35:
-	str	r5, [sp, #12]
-	mov	r7, #0
-	b	.L40
-.L57:
+	add	r0, r9, r2
+	add	r1, fp, r3
+	mov	r2, #0
+.L46:
+	add	r2, r2, #1
+	ldr	r3, [r0], #4
+	cmp	r2, #8
+	str	r3, [r1], #4
+	bne	.L46
+	add	ip, ip, #1
+	cmp	ip, #8
+	bne	.L45
+	add	r6, r6, #8
+	cmp	r6, #240
+	bne	.L48
+	add	r7, r7, #8
+	cmp	r7, #320
+	bne	.L35
+	ldr	r0, .L68+28
+	bl	puts
+	mov	r5, #0
+.L50:
+	mov	r3, r5, asl #8
+	mov	r2, r5, asl #10
+	add	r3, r3, r2
+	add	r6, fp, r3
+	mov	r4, #0
+.L51:
+	ldr	r0, [r6], #4
+	bl	__aeabi_i2d
+	mov	r2, #0
+	ldr	r3, .L68+32
+	bl	__aeabi_dmul
+	add	r4, r4, #1
+	mov	r2, r0
+	mov	r3, r1
+	ldr	r0, .L68+36
+	bl	printf
+	cmp	r4, #8
+	bne	.L51
+	add	r5, r5, #1
+	mov	r0, #10
+	bl	putchar
+	cmp	r5, #8
+	bne	.L50
+	ldr	r0, .L68+40
+	bl	puts
+	mov	r6, #120
+.L53:
+	mov	r3, r6, asl #8
+	mov	r2, r6, asl #10
+	add	r3, r3, r2
+	add	r4, fp, r3
+	mov	r5, #0
+.L54:
+	ldr	r0, [r4, #640]
+	bl	__aeabi_i2d
+	mov	r2, #0
+	ldr	r3, .L68+32
+	bl	__aeabi_dmul
+	add	r5, r5, #1
+	mov	r2, r0
+	mov	r3, r1
+	ldr	r0, .L68+36
+	bl	printf
+	cmp	r5, #8
+	add	r4, r4, #4
+	bne	.L54
+	add	r6, r6, #1
+	mov	r0, #10
+	bl	putchar
+	cmp	r6, #128
+	bne	.L53
+	mov	r0, #0
+	b	.L34
+.L69:
 	.align	2
-.L56:
+.L68:
 	.word	.LC4
 	.word	.LC5
 	.word	.LC6
 	.word	g_current_group
-	.word	g_current_group+256
 	.word	g_output_matrix
+	.word	g_pixel_matrix
+	.word	g_current_group+256
 	.word	.LC7
-	.word	.LC8
 	.word	1058013184
+	.word	.LC8
 	.word	.LC9
-	.word	g_output_matrix+154272
 	.size	main, .-main
 	.global	IMAGE_SIZE
 	.global	IMAGE_HEIGHT
