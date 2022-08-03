@@ -203,13 +203,9 @@ int main(int argc, char *argv[])
     		for (int i = 0; i < 8; i++)
             {
     			loefflers(current_group[i]);
-
-                for (int j = 0; j < 8; j++) {
-                    current_group_trans[i][j] = current_group[j][i];
-                }
     		}	
     		
-    		// transpose(current_group, current_group_trans);
+    		transpose(current_group, current_group_trans);
     		
     		for (int i = 0; i < 8; i++)
             {
