@@ -118,7 +118,6 @@ void rotator(int32_t input_1, int32_t input_2, int c, int32_t *p_output_1, int32
     p_output_1[0] = (ROTATE_CONST_O1[c] * input_2) + (ROTATE_CONST[c] * (input_1 + input_2));
     p_output_2[0] = (ROTATE_CONST_O2[c] * input_1) + (ROTATE_CONST[c] * (input_1 + input_2));
 }
-*/
 
 int32_t scale_up(int32_t input)
 {
@@ -128,6 +127,7 @@ int32_t scale_up(int32_t input)
     output = SQRT2 * input;
     return output;
 }
+*/
 
 void loefflers(int32_t * x)
 {
@@ -229,8 +229,8 @@ void loefflers(int32_t * x)
     local_x7 = tmp7 + tmp4;
     local_x4 = tmp7 - tmp4;
 
-    local_x5 = scale_up(tmp5);
-    local_x6 = scale_up(tmp6);  
+    local_x5 = SQRT2 * (tmp5 >> 7);
+    local_x6 = SQRT2 * (tmp6 >> 7);  
     
     // unscramble values
     x[7] = local_x4 >> 7;
