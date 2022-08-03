@@ -20,7 +20,6 @@ int const IMAGE_HEIGHT = 240;
 int const IMAGE_WIDTH = 320;
 
 // Constants used in Loeffler's Algorithm
-int const SQRT2 = 181;
 int const ROTATE_CONST_O1[3] = {-12873, -4520, 12539};      // Constants used for output 1 in rotators
 int const ROTATE_CONST_O2[3] = {-19266, -22725, -30273};    // Constants used for output 2 in rotators
 int const ROTATE_CONST[3] = {16069, 13622, 8866};                   // Constants used for both in rotators
@@ -122,7 +121,7 @@ int32_t scale_up(int32_t input)
     int32_t output;
 
     input = input >> 7;
-    output = SQRT2 * input;
+    output = 181 * input;   // 181 is scaled root of 2
     return output;
 }
 
