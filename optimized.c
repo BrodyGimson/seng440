@@ -176,6 +176,8 @@ int main(int argc, char *argv[])
 {
     int32_t current_group[8][8];
     int32_t current_group_trans[8][8];
+    int pos_y;
+    int pos_x;
     
     if (argc != 2)
     {
@@ -193,7 +195,10 @@ int main(int argc, char *argv[])
     {
         for (int y = 0; y < 30; y++)
         {
-    		get_next_group(x << 3, y << 3, current_group);
+            pos_x = x << 3;
+            pos_y = y << 3;
+
+    		get_next_group(pos_x, pos_y, current_group);
     		
     		for (int i = 0; i < 8; i++)
             {
@@ -213,7 +218,7 @@ int main(int argc, char *argv[])
             {
         		for (int j = 0; j < 8; j++) 
                 {
-            		g_output_matrix[(x << 3) + i][(y << 3) + j] = current_group[i][j];
+            		g_output_matrix[pos_x + i][pos_y + j] = current_group[i][j];
         		}
     		}
     	}
