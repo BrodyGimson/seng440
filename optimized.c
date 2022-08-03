@@ -105,30 +105,6 @@ void get_next_group(int current_x, int current_y)
     }
 }
 
-/*
-void reflector(int32_t input_1, int32_t input_2, int32_t *p_output_1, int32_t *p_output_2)
-{       
-    p_output_1[0] = input_1 + input_2;
-    p_output_2[0] = input_1 - input_2;
-}
-
-void rotator(int32_t input_1, int32_t input_2, int c, int32_t *p_output_1, int32_t *p_output_2)
-{
-    // Barr-C: Don't rely on C's operation precedence rules, use parentheses (1.4.a)
-    p_output_1[0] = (ROTATE_CONST_O1[c] * input_2) + (ROTATE_CONST[c] * (input_1 + input_2));
-    p_output_2[0] = (ROTATE_CONST_O2[c] * input_1) + (ROTATE_CONST[c] * (input_1 + input_2));
-}
-
-int32_t scale_up(int32_t input)
-{
-    int32_t output;
-
-    input = input >> 7;
-    output = SQRT2 * input;
-    return output;
-}
-*/
-
 void loefflers(int32_t * x)
 {
     int32_t local_x0 = x[0];
@@ -158,13 +134,6 @@ void loefflers(int32_t * x)
     tmp5 = local_x2 - local_x5;
     tmp6 = local_x1 - local_x6;
     tmp7 = local_x0 - local_x7;
-
-    /*
-    reflector(x[0], x[7], &tmp_output[0], &tmp_output[7]);
-    reflector(x[1], x[6], &tmp_output[1], &tmp_output[6]);
-    reflector(x[2], x[5], &tmp_output[2], &tmp_output[5]);
-    reflector(x[3], x[4], &tmp_output[3], &tmp_output[4]);
-    */
     
     // Even numbers
     //stage 2 
@@ -173,22 +142,12 @@ void loefflers(int32_t * x)
     local_x1 = tmp1 + tmp2;
     local_x2 = tmp1 - tmp2;
 
-    /*
-    reflector(tmp_output[0], tmp_output[3], &tmp_output[0], &tmp_output[3]);
-    reflector(tmp_output[1], tmp_output[2], &tmp_output[1], &tmp_output[2]);
-    */
-
     //stage 3
     tmp0 = local_x0 + local_x1;
     tmp1 = local_x0 - local_x1;
 
     tmp2 = (ROTATE_CONST_O1[2] * local_x3) + (ROTATE_CONST[2] * (local_x2 + local_x3));
     tmp3 = (ROTATE_CONST_O2[2] * local_x2) + (ROTATE_CONST[2] * (local_x2 + local_x3));
-
-    /*
-    reflector(tmp_output[0], tmp_output[1], &tmp_output[0], &tmp_output[1]);
-    rotator(tmp_output[2], tmp_output[3], 2, &tmp_output[2], &tmp_output[3]);
-    */
 
     // unscramble values
     x[0] = tmp0 << 7;
@@ -204,18 +163,7 @@ void loefflers(int32_t * x)
     local_x5 = (ROTATE_CONST_O1[0] * tmp6) + (ROTATE_CONST[0] * (tmp5 + tmp6));
     local_x6 = (ROTATE_CONST_O2[0] * tmp5) + (ROTATE_CONST[0] * (tmp5 + tmp6));
 
-    /*
-    rotator(tmp_output[4], tmp_output[7], 1, &tmp_output[4], &tmp_output[7]);
-    rotator(tmp_output[5], tmp_output[6], 0, &tmp_output[5], &tmp_output[6]);
-    */
-
     // stage 3
-
-    /*
-    reflector(tmp_output[4], tmp_output[6], &tmp_output[4], &tmp_output[6]);
-    reflector(tmp_output[7], tmp_output[5], &tmp_output[7], &tmp_output[5]);
-    */
-
     tmp4 = local_x4 + local_x6;
     tmp6 = local_x4 - local_x6;
 
@@ -223,9 +171,6 @@ void loefflers(int32_t * x)
     tmp5 = local_x7 - local_x5;
 
     //stage 4
-    /*
-    reflector(tmp_output[7], tmp_output[4], &tmp_output[7], &tmp_output[4]);
-    */
     local_x7 = tmp7 + tmp4;
     local_x4 = tmp7 - tmp4;
 
