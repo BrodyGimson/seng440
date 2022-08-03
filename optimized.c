@@ -167,24 +167,16 @@ void loefflers(int32_t * x)
     */
     
     // Even numbers
-    local_x0 = tmp0;
-    local_x1 = tmp1;
-    local_x2 = tmp2;
-    local_x3 = tmp3;
     //stage 2 
-    tmp0 = local_x0 + local_x3;
-    tmp3 = local_x0 - local_x3;
-    tmp1 = local_x1 + local_x2;
-    tmp2 = local_x1 - local_x2;
+    local_x0 = tmp0 + tmp3;
+    local_x3 = tmp0 - tmp3;
+    local_x1 = tmp1 + tmp2;
+    local_x2 = tmp1 - tmp2;
 
     /*
     reflector(tmp_output[0], tmp_output[3], &tmp_output[0], &tmp_output[3]);
     reflector(tmp_output[1], tmp_output[2], &tmp_output[1], &tmp_output[2]);
     */
-    local_x0 = tmp0;
-    local_x1 = tmp1;
-    local_x2 = tmp2;
-    local_x3 = tmp3;
 
     //stage 3
     tmp0 = local_x0 + local_x1;
@@ -205,16 +197,12 @@ void loefflers(int32_t * x)
     x[6] = tmp3 >> 7;
     
     // Odd numbers
-    local_x4 = tmp4;
-    local_x5 = tmp5;
-    local_x6 = tmp6;
-    local_x7 = tmp7;
     // stage 2
-    tmp4 = (ROTATE_CONST_O1[1] * local_x7) + (ROTATE_CONST[1] * (local_x7 + local_x4));
-    tmp7 = (ROTATE_CONST_O2[1] * local_x4) + (ROTATE_CONST[1] * (local_x7 + local_x4));
+    local_x4 = (ROTATE_CONST_O1[1] * tmp7) + (ROTATE_CONST[1] * (tmp7 + tmp4));
+    local_x7 = (ROTATE_CONST_O2[1] * tmp4) + (ROTATE_CONST[1] * (tmp7 + tmp4));
 
-    tmp5 = (ROTATE_CONST_O1[0] * local_x6) + (ROTATE_CONST[0] * (local_x5 + local_x6));
-    tmp6 = (ROTATE_CONST_O2[0] * local_x5) + (ROTATE_CONST[0] * (local_x5 + local_x6));
+    local_x5 = (ROTATE_CONST_O1[0] * tmp6) + (ROTATE_CONST[0] * (tmp5 + tmp6));
+    local_x6 = (ROTATE_CONST_O2[0] * tmp5) + (ROTATE_CONST[0] * (tmp5 + tmp6));
 
     /*
     rotator(tmp_output[4], tmp_output[7], 1, &tmp_output[4], &tmp_output[7]);
@@ -222,10 +210,6 @@ void loefflers(int32_t * x)
     */
 
     // stage 3
-    local_x4 = tmp4;
-    local_x5 = tmp5;
-    local_x6 = tmp6;
-    local_x7 = tmp7;
 
     /*
     reflector(tmp_output[4], tmp_output[6], &tmp_output[4], &tmp_output[6]);
@@ -239,25 +223,20 @@ void loefflers(int32_t * x)
     tmp5 = local_x7 - local_x5;
 
     //stage 4
-    local_x4 = tmp4;
-    local_x5 = tmp5;
-    local_x6 = tmp6;
-    local_x7 = tmp7;
-
     /*
     reflector(tmp_output[7], tmp_output[4], &tmp_output[7], &tmp_output[4]);
     */
-    tmp7 = local_x7 + local_x4;
-    tmp4 = local_x7 - local_x4;
+    local_x7 = tmp7 + tmp4;
+    local_x4 = tmp7 - tmp4;
 
-    tmp5 = scale_up(local_x5);
-    tmp6 = scale_up(local_x6);  
+    local_x5 = scale_up(tmp5);
+    local_x6 = scale_up(tmp6);  
     
     // unscramble values
-    x[7] = tmp4 >> 7;
-    x[3] = tmp5 >> 7;
-    x[5] = tmp6 >> 7;
-    x[1] = tmp7 >> 7;
+    x[7] = local_x4 >> 7;
+    x[3] = local_x5 >> 7;
+    x[5] = local_x6 >> 7;
+    x[1] = local_x7 >> 7;
 }
 
 int main(int argc, char *argv[])
