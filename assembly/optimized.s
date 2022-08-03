@@ -147,132 +147,121 @@ scale_up:
 	.global	loefflers
 	.type	loefflers, %function
 loefflers:
-	@ args = 0, pretend = 0, frame = 48
+	@ args = 0, pretend = 0, frame = 72
 	@ frame_needed = 0, uses_anonymous_args = 0
 	stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
-	sub	sp, sp, #60
+	sub	sp, sp, #84
 	mov	r4, r0
-	str	r0, [sp, #8]
-	add	r9, sp, #24
+	mov	fp, r0
 	ldr	r0, [r0, #0]
-	mov	r2, r4
-	ldr	r1, [r2, #28]!
-	str	r2, [sp, #8]
-	mov	r2, r9
-	add	r3, sp, #52
+	ldr	r1, [fp, #28]!
+	add	r2, sp, #48
+	add	r3, sp, #76
 	bl	reflector
 	str	r4, [sp, #12]
-	mov	fp, r4
-	add	sl, sp, #28
-	mov	r3, r4
-	ldr	r0, [r3, #4]!
-	str	r3, [sp, #12]
-	ldr	r1, [fp, #24]!
-	mov	r2, sl
-	add	r3, sp, #48
-	bl	reflector
-	mov	r8, r4
-	str	r4, [sp, #16]
-	add	r7, sp, #32
-	ldr	r0, [r8, #8]!
+	mov	r7, r4
 	mov	r2, r4
-	ldr	r1, [r2, #20]!
-	str	r2, [sp, #16]
-	mov	r2, r7
-	add	r3, sp, #44
+	ldr	r0, [r2, #4]!
+	str	r2, [sp, #12]
+	ldr	r1, [r7, #24]!
+	add	r2, sp, #52
+	add	r3, sp, #72
 	bl	reflector
-	str	r4, [sp, #20]
 	mov	r6, r4
-	add	r5, sp, #36
-	mov	r3, r4
-	ldr	r0, [r3, #12]!
-	str	r3, [sp, #20]
-	ldr	r1, [r6, #16]!
-	mov	r2, r5
-	add	r3, sp, #40
+	mov	r9, r4
+	ldr	r0, [r6, #8]!
+	ldr	r1, [r9, #20]!
+	add	r2, sp, #56
+	add	r3, sp, #68
 	bl	reflector
-	ldr	r0, [sp, #24]
-	ldr	r1, [sp, #36]
-	mov	r2, r9
-	mov	r3, r5
+	mov	sl, r4
+	mov	r5, r4
+	add	r8, sp, #60
+	ldr	r0, [sl, #12]!
+	ldr	r1, [r5, #16]!
+	mov	r2, r8
+	add	r3, sp, #64
 	bl	reflector
-	ldr	r0, [sp, #28]
-	ldr	r1, [sp, #32]
-	mov	r2, sl
-	mov	r3, r7
+	ldr	r0, [sp, #48]
+	ldr	r1, [sp, #60]
+	add	r2, sp, #16
+	add	r3, sp, #28
 	bl	reflector
+	ldr	r0, [sp, #52]
+	ldr	r1, [sp, #56]
+	add	r2, sp, #20
+	add	r3, sp, #24
+	bl	reflector
+	ldr	r0, [sp, #16]
+	ldr	r1, [sp, #20]
+	add	r2, sp, #48
+	add	r3, sp, #52
+	bl	reflector
+	str	r8, [sp, #0]
 	ldr	r0, [sp, #24]
 	ldr	r1, [sp, #28]
-	mov	r2, r9
-	mov	r3, sl
-	bl	reflector
-	str	r5, [sp, #0]
-	ldr	r0, [sp, #32]
-	ldr	r1, [sp, #36]
 	mov	r2, #2
-	mov	r3, r7
+	add	r3, sp, #56
 	bl	rotator
-	ldr	r3, [sp, #24]
+	ldr	r3, [sp, #48]
 	mov	r3, r3, asl #7
 	str	r3, [r4, #0]
-	ldr	r3, [sp, #28]
+	ldr	r3, [sp, #52]
 	mov	r3, r3, asl #7
+	str	r3, [r5, #0]
+	ldr	r3, [sp, #56]
+	mov	r3, r3, asr #7
 	str	r3, [r6, #0]
-	ldr	r3, [sp, #32]
+	ldr	r3, [sp, #60]
 	mov	r3, r3, asr #7
-	str	r3, [r8, #0]
-	ldr	r3, [sp, #36]
-	mov	r3, r3, asr #7
-	str	r3, [fp, #0]
-	add	r2, sp, #52
-	str	r2, [sp, #0]
-	ldr	r0, [sp, #40]
-	ldr	r1, [sp, #52]
+	str	r3, [r7, #0]
+	add	r5, sp, #32
+	add	r4, sp, #44
+	str	r4, [sp, #0]
+	ldr	r0, [sp, #64]
+	ldr	r1, [sp, #76]
 	mov	r2, #1
-	add	r3, sp, #40
+	mov	r3, r5
 	bl	rotator
-	add	r3, sp, #48
+	add	r3, sp, #40
 	str	r3, [sp, #0]
-	ldr	r0, [sp, #44]
-	ldr	r1, [sp, #48]
+	ldr	r0, [sp, #68]
+	ldr	r1, [sp, #72]
 	mov	r2, #0
-	add	r3, sp, #44
+	add	r3, sp, #36
 	bl	rotator
-	ldr	r0, [sp, #40]
-	ldr	r1, [sp, #48]
-	add	r2, sp, #40
-	add	r3, sp, #48
-	bl	reflector
-	ldr	r0, [sp, #52]
-	ldr	r1, [sp, #44]
-	add	r2, sp, #52
-	add	r3, sp, #44
-	bl	reflector
-	ldr	r0, [sp, #52]
+	ldr	r0, [sp, #32]
 	ldr	r1, [sp, #40]
-	add	r2, sp, #52
-	add	r3, sp, #40
+	add	r2, sp, #64
+	add	r3, sp, #72
 	bl	reflector
 	ldr	r0, [sp, #44]
+	ldr	r1, [sp, #36]
+	add	r2, sp, #76
+	add	r3, sp, #68
+	bl	reflector
+	ldr	r0, [sp, #76]
+	ldr	r1, [sp, #64]
+	mov	r2, r4
+	mov	r3, r5
+	bl	reflector
+	ldr	r0, [sp, #68]
 	bl	scale_up
 	mov	r4, r0
-	ldr	r0, [sp, #48]
+	ldr	r0, [sp, #72]
 	bl	scale_up
-	ldr	r3, [sp, #40]
+	ldr	r3, [sp, #32]
 	mov	r3, r3, asr #7
-	ldr	r2, [sp, #8]
-	str	r3, [r2, #0]
+	str	r3, [fp, #0]
 	mov	r4, r4, asr #7
-	ldr	r3, [sp, #20]
-	str	r4, [r3, #0]
+	str	r4, [sl, #0]
 	mov	r0, r0, asr #7
-	ldr	r2, [sp, #16]
-	str	r0, [r2, #0]
-	ldr	r3, [sp, #52]
+	str	r0, [r9, #0]
+	ldr	r3, [sp, #44]
 	mov	r3, r3, asr #7
 	ldr	r2, [sp, #12]
 	str	r3, [r2, #0]
-	add	sp, sp, #60
+	add	sp, sp, #84
 	ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
 	.size	loefflers, .-loefflers
 	.align	2
