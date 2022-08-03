@@ -112,10 +112,9 @@ void reflector(int32_t input_1, int32_t input_2, int32_t *p_output_1, int32_t *p
 
 void rotator(int32_t input_1, int32_t input_2, int c, int32_t *p_output_1, int32_t *p_output_2)
 {
-    int local_rotate_const = ROTATE_CONST[c];
     // Barr-C: Don't rely on C's operation precedence rules, use parentheses (1.4.a)
-    p_output_1[0] = (ROTATE_CONST_O1[c] * input_2) + (local_rotate_const * (input_1 + input_2));
-    p_output_2[0] = (ROTATE_CONST_O2[c] * input_1) + (local_rotate_const * (input_1 + input_2));
+    p_output_1[0] = (ROTATE_CONST_O1[c] * input_2) + (ROTATE_CONST[c] * (input_1 + input_2));
+    p_output_2[0] = (ROTATE_CONST_O2[c] * input_1) + (ROTATE_CONST[c] * (input_1 + input_2));
 }
 
 int32_t scale_up(int32_t input)
