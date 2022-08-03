@@ -107,6 +107,8 @@ void get_next_group(int current_x, int current_y)
 
 void loefflers(int32_t * x)
 {
+    int32_t local_rotate_const;
+
     int32_t local_x0 = x[0];
     int32_t local_x1 = x[1];
     int32_t local_x2 = x[2];
@@ -136,18 +138,19 @@ void loefflers(int32_t * x)
     tmp7 = local_x0 - local_x7;
     
     // Even numbers
-    //stage 2 
+    // stage 2 
     local_x0 = tmp0 + tmp3;
     local_x3 = tmp0 - tmp3;
     local_x1 = tmp1 + tmp2;
     local_x2 = tmp1 - tmp2;
 
-    //stage 3
+    // stage 3
     tmp0 = local_x0 + local_x1;
     tmp1 = local_x0 - local_x1;
 
-    tmp2 = (ROTATE_CONST_O1[2] * local_x3) + (ROTATE_CONST[2] * (local_x2 + local_x3));
-    tmp3 = (ROTATE_CONST_O2[2] * local_x2) + (ROTATE_CONST[2] * (local_x2 + local_x3));
+    local_rotate_const = ROTATE_CONST[2];
+    tmp2 = (ROTATE_CONST_O1[2] * local_x3) + (local_rotate_const * (local_x2 + local_x3));
+    tmp3 = (ROTATE_CONST_O2[2] * local_x2) + (local_rotate_const * (local_x2 + local_x3));
 
     // unscramble values
     x[0] = tmp0 << 7;
@@ -157,11 +160,13 @@ void loefflers(int32_t * x)
     
     // Odd numbers
     // stage 2
-    local_x4 = (ROTATE_CONST_O1[1] * tmp7) + (ROTATE_CONST[1] * (tmp7 + tmp4));
-    local_x7 = (ROTATE_CONST_O2[1] * tmp4) + (ROTATE_CONST[1] * (tmp7 + tmp4));
+    local_rotate_const = ROTATE_CONST[1];
+    local_x4 = (ROTATE_CONST_O1[1] * tmp7) + (local_rotate_const * (tmp7 + tmp4));
+    local_x7 = (ROTATE_CONST_O2[1] * tmp4) + (local_rotate_const * (tmp7 + tmp4));
 
-    local_x5 = (ROTATE_CONST_O1[0] * tmp6) + (ROTATE_CONST[0] * (tmp5 + tmp6));
-    local_x6 = (ROTATE_CONST_O2[0] * tmp5) + (ROTATE_CONST[0] * (tmp5 + tmp6));
+    local_rotate_const = ROTATE_CONST[0];
+    local_x5 = (ROTATE_CONST_O1[0] * tmp6) + (local_rotate_const * (tmp5 + tmp6));
+    local_x6 = (ROTATE_CONST_O2[0] * tmp5) + (local_rotate_const * (tmp5 + tmp6));
 
     // stage 3
     tmp4 = local_x4 + local_x6;
