@@ -3,5 +3,6 @@ float-version
 unoptimized
 optimized
 neon
+test_pack
 .vscode
 *.exe
