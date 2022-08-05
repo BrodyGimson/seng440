@@ -77,7 +77,7 @@ void get_next_group(int current_x, int current_y, int32_t p_current_group[][8])
         for (int j = 0; j < 8; j++) 
         {
             shift = j >> 2;
-            mask_index = j - ((shift) << 2);
+            mask_index = j - ((shift) << 2);        // Equivalent to j % 4
             
             cur_value = g_pixel_matrix[current_y + i][current_x + shift];
             pixel_value = (cur_value & masks[mask_index]) >> ((mask_index) << 3);
