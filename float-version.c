@@ -179,20 +179,6 @@ int main(int argc, char *argv[]){
         }
         printf("\n");
     }
-
-    printf("\nTest 1D\n");
-    getNextGroup(160, 120);
-
-    for (int i = 0; i < 8; i++) {
-        printf("%f, ", current_group[0][i]);
-    }
-
-    loefflers(current_group[0]);
-
-    for (int i = 0; i < 8; i++) {
-        printf("%f, ", current_group[0][i]);
-    }
-    printf("\n");
     			
     return 0;
 }
