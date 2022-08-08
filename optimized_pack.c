@@ -95,23 +95,23 @@ void transpose(int32_t orig[][8], int32_t trans[][8])
 void get_next_group(int current_x, int current_y, int32_t p_current_group[][8]) 
 {
     uint32_t masks[4] = { 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000 };
-    uint32_t shift;
-    uint32_t mask_index;
     uint32_t cur_value;
-    uint32_t pixel_value;
 
     for (int i = 0; i < 8; i++) 
-    {
-        for (int j = 0; j < 8; j++) 
-        {
-            shift = j >> 2;
-            mask_index = j - ((shift) << 2);        // Equivalent to j % 4
-            
-            cur_value = g_pixel_matrix[current_y + i][current_x + shift];
-            pixel_value = (cur_value & masks[mask_index]) >> ((mask_index) << 3);
+    {   
+        cur_value = g_pixel_matrix[current_y + i][current_x + 0];
+        
+        p_current_group[i][0] = cur_value & masks[0];
+        p_current_group[i][1] = (cur_value & masks[1]) >> 8;
+        p_current_group[i][2] = (cur_value & masks[2]) >> 16;
+        p_current_group[i][3] = (cur_value & masks[3]) >> 24;
 
-            p_current_group[i][j] = pixel_value;
-        }
+        cur_value = g_pixel_matrix[current_y + i][current_x + 1];
+
+        p_current_group[i][4] = cur_value & masks[0];
+        p_current_group[i][5] = (cur_value & masks[1]) >> 8;
+        p_current_group[i][6] = (cur_value & masks[2]) >> 16;
+        p_current_group[i][7] = (cur_value & masks[3]) >> 24;
     }
 }
 
