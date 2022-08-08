@@ -87,6 +87,15 @@ void get_next_group(int current_x, int current_y, int32_t p_current_group[][8])
     }
 }
 
+void transpose(int32_t A[][8], int32_t B[][8]){
+
+    for(int i = 0; i < 8; i++){
+        for(int j = 0; j < 8; j++){
+            B[i][j] = A[j][i];
+        }
+    }
+}
+
 int main(int argc, char *argv[])
 {
     int32_t current_group_trans[8][8];
@@ -119,6 +128,16 @@ int main(int argc, char *argv[])
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             printf("%d, ", current_group[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+
+    transpose(current_group, current_group_trans);
+
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            printf("%d, ", current_group_trans[i][j]);
         }
         printf("\n");
     }
