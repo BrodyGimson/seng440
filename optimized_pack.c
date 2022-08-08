@@ -99,7 +99,7 @@ void get_next_group(int current_x, int current_y, int32_t p_current_group[][8])
 
     for (int i = 0; i < 8; i++) 
     {   
-        cur_value = g_pixel_matrix[current_y + i][current_x + 0];
+        cur_value = g_pixel_matrix[current_y + i][current_x];
         
         p_current_group[i][0] = cur_value & masks[0];
         p_current_group[i][1] = (cur_value & masks[1]) >> 8;
