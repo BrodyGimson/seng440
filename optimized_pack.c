@@ -33,7 +33,7 @@ void get_image(char *p_image_name)
     // Barr-C: Pointers should start with "p_" (7.1.k)
     // Barr-C: variables initialized before use (7.2.a)
     FILE *p_image_file;
-    int *cbinary;
+    int cbinary[1];
     int error;
 
     fflush(stdout);
@@ -74,7 +74,7 @@ void get_image(char *p_image_name)
             }
             else
             {
-                g_pixel_matrix[i][j] = *cbinary;
+                g_pixel_matrix[i][j] = cbinary[0];
             }
         }
     }
