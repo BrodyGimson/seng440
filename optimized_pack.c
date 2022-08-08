@@ -22,7 +22,7 @@ int const SQRT2 = 181;
 int const ROTATE_CONST_O1[3] = {-12873, -4520, 12539};      // Constants used for output 1 in rotators
 int const ROTATE_CONST_O2[3] = {-19266, -22725, -30273};    // Constants used for output 2 in rotators
 int const ROTATE_CONST[3] = {16069, 13622, 8866};                   // Constants used for both in rotators
-int const END_SCALE = 16384;                                        // Ending scale factor
+int const END_SCALE = 1024;                                        // Ending scale factor
 
 // Barr-C: Global variables should start with "g_" (7.1.j)
 int32_t g_pixel_matrix[240][80];
@@ -158,10 +158,10 @@ void loefflers(int32_t * x)
     rotator(tmp_output2[2], tmp_output2[3], 2, &tmp_output[2], &tmp_output[3]);
     
     // unscramble values
-    x[0] = tmp_output[0] << 7;
-    x[4] = tmp_output[1] << 7;
-    x[2] = tmp_output[2] >> 7;
-    x[6] = tmp_output[3] >> 7;
+    x[0] = tmp_output[0] << 5;
+    x[4] = tmp_output[1] << 5;
+    x[2] = tmp_output[2] >> 9;
+    x[6] = tmp_output[3] >> 9;
 
     //Odd Numbers
     // stage 2
@@ -178,10 +178,10 @@ void loefflers(int32_t * x)
     tmp_output2[6] = scale_up(tmp_output[6]);  
     
     // unscramble values
-    x[7] = tmp_output2[4] >> 7;
-    x[3] = tmp_output2[5] >> 7;
-    x[5] = tmp_output2[6] >> 7;
-    x[1] = tmp_output2[7] >> 7;
+    x[7] = tmp_output2[4] >> 9;
+    x[3] = tmp_output2[5] >> 9;
+    x[5] = tmp_output2[6] >> 9;
+    x[1] = tmp_output2[7] >> 9;
 }
 
 int main(int argc, char *argv[])
@@ -255,20 +255,6 @@ int main(int argc, char *argv[])
         }
         printf("\n");
     }
-
-    printf("\nTest 1D\n");
-    get_next_group(160, 120, current_group);
-
-    for (int i = 0; i < 8; i++) {
-        printf("%d, ", current_group[0][i]);
-    }
-
-    loefflers(current_group[0]);
-
-    for (int i = 0; i < 8; i++) {
-        printf("%f, ", (double) current_group[0][i] / 128);
-    }
-    printf("\n");
     			
     return 0;
 }
