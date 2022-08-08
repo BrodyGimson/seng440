@@ -161,7 +161,7 @@ int main(int argc, char *argv[]){
     }
 
     printf("\nLoefflers 8x8 Center\n");
-    getNextGroup(120, 160);
+    getNextGroup(160, 120);
     for(int i = 0; i < 8; i++){
     	loefflers(current_group[i]);
     }
