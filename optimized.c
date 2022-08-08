@@ -191,9 +191,9 @@ int main(int argc, char *argv[])
 
     get_image(argv[1]);
 
-    for (int x = 0; x < 40; x++)
+    for (int y = 0; y < 30; y++)
     {
-        for (int y = 0; y < 30; y++)
+        for (int x = 0; x < 40; x++)
         {
             pos_x = x << 3;
             pos_y = y << 3;
@@ -216,7 +216,7 @@ int main(int argc, char *argv[])
             {
                 for (int j = 0; j < 8; j++) 
                 {
-                    g_output_matrix[pos_x + i][pos_y + j] = current_group_trans[j][i];
+                    g_output_matrix[pos_y + i][pos_x + j] = current_group_trans[j][i];
                 }
             }
         }

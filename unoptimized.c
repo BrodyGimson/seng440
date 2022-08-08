@@ -181,9 +181,9 @@ int main(int argc, char *argv[])
 
     get_image(argv[1]);
 
-    for (int x = 0; x < 40; x++)
+    for (int y = 0; y < 30; y++)
     {
-        for (int y = 0; y < 30; y++)
+        for (int x = 0; x < 40; x++)
         {
             get_next_group(8*x, 8*y);
             
@@ -205,7 +205,7 @@ int main(int argc, char *argv[])
             {
                 for (int j = 0; j < 8; j++) 
                 {
-                    g_output_matrix[x*8 + i][y*8 + j] = g_current_group[i][j];
+                    g_output_matrix[y*8 + i][x*8 + j] = g_current_group[i][j];
                 }
             }
         }
