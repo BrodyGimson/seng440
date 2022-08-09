@@ -8,7 +8,7 @@
 	.eabi_attribute 26, 2
 	.eabi_attribute 30, 1
 	.eabi_attribute 18, 4
-	.file	"unoptimized.c"
+	.file	"optimized_pack.c"
 	.text
 	.align	2
 	.global	transpose
@@ -50,43 +50,48 @@ get_next_group:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	@ link register save eliminated.
-	stmfd	sp!, {r4, r5, r6, r7}
-	mov	r5, r0
-	mov	r4, r1
-	ldr	r1, .L15
-	mov	r0, #0
-	ldr	r7, .L15+4
-	ldr	r6, .L15+8
-	b	.L9
-.L10:
-	ldr	r3, [ip], #4
-	str	r3, [r2], #4
-	cmp	r1, r2
-	bne	.L10
-	add	r0, r0, #1
-	add	r1, r1, #32
-	cmp	r0, #8
-	beq	.L14
+	mov	r3, r1, asl #4
+	mov	r1, r1, asl #6
+	add	r3, r3, r1
+	add	r3, r3, r0
+	mov	r3, r3, asl #2
+	ldr	r1, .L12
+	add	r1, r1, r3
+	mov	r0, r2
+	mov	ip, #0
 .L9:
-	add	r3, r0, r4
-	mov	r2, r3, asl #6
-	mov	r3, r3, asl #8
-	add	r2, r2, r3
-	add	r2, r2, r5
-	mov	r2, r2, asl #2
-	add	ip, r7, r2
-	mov	r3, r0, asl #5
-	add	r2, r6, r3
-	b	.L10
-.L14:
-	ldmfd	sp!, {r4, r5, r6, r7}
+	ldr	r2, [r1, #0]
+	and	r3, r2, #255
+	str	r3, [r0, #0]
+	and	r3, r2, #65280
+	mov	r3, r3, lsr #8
+	str	r3, [r0, #4]
+	and	r3, r2, #16711680
+	mov	r3, r3, lsr #16
+	str	r3, [r0, #8]
+	mov	r2, r2, lsr #24
+	str	r2, [r0, #12]
+	ldr	r2, [r1, #4]
+	and	r3, r2, #255
+	str	r3, [r0, #16]
+	and	r3, r2, #65280
+	mov	r3, r3, lsr #8
+	str	r3, [r0, #20]
+	and	r3, r2, #16711680
+	mov	r3, r3, lsr #16
+	str	r3, [r0, #24]
+	mov	r2, r2, lsr #24
+	str	r2, [r0, #28]
+	add	ip, ip, #1
+	add	r1, r1, #320
+	add	r0, r0, #32
+	cmp	ip, #8
+	bne	.L9
 	bx	lr
-.L16:
+.L13:
 	.align	2
-.L15:
-	.word	g_current_group+32
+.L12:
 	.word	g_pixel_matrix
-	.word	g_current_group
 	.size	get_next_group, .-get_next_group
 	.align	2
 	.global	reflector
@@ -109,7 +114,7 @@ rotator:
 	@ frame_needed = 0, uses_anonymous_args = 0
 	@ link register save eliminated.
 	stmfd	sp!, {r4, r5}
-	ldr	r4, .L21
+	ldr	r4, .L18
 	add	r5, r1, r0
 	ldr	ip, [r4, r2, asl #2]
 	mul	ip, r5, ip
@@ -124,9 +129,9 @@ rotator:
 	str	r2, [r3, #0]
 	ldmfd	sp!, {r4, r5}
 	bx	lr
-.L22:
+.L19:
 	.align	2
-.L21:
+.L18:
 	.word	.LANCHOR0
 	.size	rotator, .-rotator
 	.align	2
@@ -148,136 +153,121 @@ scale_up:
 	.global	loefflers
 	.type	loefflers, %function
 loefflers:
-	@ args = 0, pretend = 0, frame = 56
+	@ args = 0, pretend = 0, frame = 72
 	@ frame_needed = 0, uses_anonymous_args = 0
 	stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
-	sub	sp, sp, #68
-	mov	r5, r0
-	str	r0, [sp, #12]
+	sub	sp, sp, #84
+	mov	r4, r0
+	mov	fp, r0
 	ldr	r0, [r0, #0]
-	mov	r2, r5
-	ldr	r1, [r2, #28]!
-	str	r2, [sp, #12]
-	add	r2, sp, #32
-	add	r3, sp, #60
+	ldr	r1, [fp, #28]!
+	add	r2, sp, #48
+	add	r3, sp, #76
 	bl	reflector
-	str	r5, [sp, #16]
-	str	r5, [sp, #20]
-	add	r8, sp, #36
-	mov	r3, r5
-	ldr	r0, [r3, #4]!
-	str	r3, [sp, #16]
-	mov	r2, r5
-	ldr	r1, [r2, #24]!
-	str	r2, [sp, #20]
-	mov	r2, r8
-	add	r3, sp, #56
-	bl	reflector
-	str	r5, [sp, #24]
-	str	r5, [sp, #28]
-	add	r7, sp, #40
-	add	r9, sp, #52
-	mov	r3, r5
-	ldr	r0, [r3, #8]!
-	str	r3, [sp, #24]
-	mov	r2, r5
-	ldr	r1, [r2, #20]!
-	str	r2, [sp, #28]
-	mov	r2, r7
-	mov	r3, r9
-	bl	reflector
-	mov	fp, r5
-	mov	sl, r5
-	add	r4, sp, #44
-	add	r6, sp, #48
-	ldr	r0, [fp, #12]!
-	ldr	r1, [sl, #16]!
+	str	r4, [sp, #12]
+	mov	r7, r4
 	mov	r2, r4
-	mov	r3, r6
+	ldr	r0, [r2, #4]!
+	str	r2, [sp, #12]
+	ldr	r1, [r7, #24]!
+	add	r2, sp, #52
+	add	r3, sp, #72
 	bl	reflector
-	ldr	r0, [sp, #32]
-	ldr	r1, [sp, #44]
-	add	r2, sp, #32
-	mov	r3, r4
+	mov	r6, r4
+	mov	r9, r4
+	ldr	r0, [r6, #8]!
+	ldr	r1, [r9, #20]!
+	add	r2, sp, #56
+	add	r3, sp, #68
 	bl	reflector
-	ldr	r0, [sp, #36]
-	ldr	r1, [sp, #40]
+	mov	sl, r4
+	mov	r5, r4
+	add	r8, sp, #60
+	ldr	r0, [sl, #12]!
+	ldr	r1, [r5, #16]!
 	mov	r2, r8
-	mov	r3, r7
+	add	r3, sp, #64
 	bl	reflector
-	add	r3, sp, #60
-	str	r3, [sp, #0]
 	ldr	r0, [sp, #48]
 	ldr	r1, [sp, #60]
-	mov	r2, #1
-	mov	r3, r6
-	bl	rotator
-	add	r2, sp, #56
-	str	r2, [sp, #0]
+	add	r2, sp, #16
+	add	r3, sp, #28
+	bl	reflector
 	ldr	r0, [sp, #52]
 	ldr	r1, [sp, #56]
-	mov	r2, #0
-	mov	r3, r9
-	bl	rotator
-	ldr	r0, [sp, #32]
-	ldr	r1, [sp, #36]
-	add	r2, sp, #32
-	mov	r3, r8
+	add	r2, sp, #20
+	add	r3, sp, #24
 	bl	reflector
-	str	r4, [sp, #0]
-	ldr	r0, [sp, #40]
-	ldr	r1, [sp, #44]
+	ldr	r0, [sp, #16]
+	ldr	r1, [sp, #20]
+	add	r2, sp, #48
+	add	r3, sp, #52
+	bl	reflector
+	str	r8, [sp, #0]
+	ldr	r0, [sp, #24]
+	ldr	r1, [sp, #28]
 	mov	r2, #2
-	mov	r3, r7
-	bl	rotator
-	ldr	r0, [sp, #48]
-	ldr	r1, [sp, #56]
-	mov	r2, r6
 	add	r3, sp, #56
-	bl	reflector
-	ldr	r0, [sp, #60]
-	ldr	r1, [sp, #52]
-	add	r2, sp, #60
-	mov	r3, r9
-	bl	reflector
-	ldr	r0, [sp, #60]
-	ldr	r1, [sp, #48]
-	add	r2, sp, #60
-	mov	r3, r6
-	bl	reflector
-	ldr	r0, [sp, #52]
-	bl	scale_up
-	mov	r4, r0
-	ldr	r0, [sp, #56]
-	bl	scale_up
-	ldr	r3, [sp, #32]
+	bl	rotator
+	ldr	r3, [sp, #48]
+	mov	r3, r3, asl #5
+	str	r3, [r4, #0]
+	ldr	r3, [sp, #52]
 	mov	r3, r3, asl #5
 	str	r3, [r5, #0]
-	ldr	r3, [sp, #36]
-	mov	r3, r3, asl #5
-	str	r3, [sl, #0]
-	ldr	r3, [sp, #40]
+	ldr	r3, [sp, #56]
 	mov	r3, r3, asr #9
-	ldr	r2, [sp, #24]
-	str	r3, [r2, #0]
+	str	r3, [r6, #0]
+	ldr	r3, [sp, #60]
+	mov	r3, r3, asr #9
+	str	r3, [r7, #0]
+	add	r5, sp, #32
+	add	r4, sp, #44
+	str	r4, [sp, #0]
+	ldr	r0, [sp, #64]
+	ldr	r1, [sp, #76]
+	mov	r2, #1
+	mov	r3, r5
+	bl	rotator
+	add	r3, sp, #40
+	str	r3, [sp, #0]
+	ldr	r0, [sp, #68]
+	ldr	r1, [sp, #72]
+	mov	r2, #0
+	add	r3, sp, #36
+	bl	rotator
+	ldr	r0, [sp, #32]
+	ldr	r1, [sp, #40]
+	add	r2, sp, #64
+	add	r3, sp, #72
+	bl	reflector
+	ldr	r0, [sp, #44]
+	ldr	r1, [sp, #36]
+	add	r2, sp, #76
+	add	r3, sp, #68
+	bl	reflector
+	ldr	r0, [sp, #76]
+	ldr	r1, [sp, #64]
+	mov	r2, r4
+	mov	r3, r5
+	bl	reflector
+	ldr	r0, [sp, #68]
+	bl	scale_up
+	mov	r4, r0
+	ldr	r0, [sp, #72]
+	bl	scale_up
+	ldr	r3, [sp, #32]
+	mov	r3, r3, asr #9
+	str	r3, [fp, #0]
+	mov	r4, r4, asr #9
+	str	r4, [sl, #0]
+	mov	r0, r0, asr #9
+	str	r0, [r9, #0]
 	ldr	r3, [sp, #44]
-	mov	r3, r3, asr #9
-	ldr	r2, [sp, #20]
-	str	r3, [r2, #0]
-	ldr	r3, [sp, #48]
 	mov	r3, r3, asr #9
 	ldr	r2, [sp, #12]
 	str	r3, [r2, #0]
-	mov	r4, r4, asr #9
-	str	r4, [fp, #0]
-	mov	r0, r0, asr #9
-	ldr	r3, [sp, #28]
-	str	r0, [r3, #0]
-	ldr	r3, [sp, #60]
-	mov	r3, r3, asr #9
-	ldr	r2, [sp, #16]
-	str	r3, [r2, #0]
-	add	sp, sp, #68
+	add	sp, sp, #84
 	ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
 	.size	loefflers, .-loefflers
 	.align	2
@@ -286,68 +276,75 @@ loefflers:
 get_image:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+	stmfd	sp!, {r3, r4, r5, r6, r7, r8, r9, sl, fp, lr}
 	mov	r4, r0
-	ldr	r3, .L37
+	ldr	r3, .L34
 	ldr	r0, [r3, #0]
 	bl	fflush
 	mov	r0, r4
-	ldr	r1, .L37+4
+	ldr	r1, .L34+4
 	bl	fopen
 	subs	r6, r0, #0
-	bne	.L28
-	ldr	r0, .L37+8
+	bne	.L25
+	ldr	r0, .L34+8
 	bl	perror
-.L28:
+.L25:
 	mov	r0, r6
 	mov	r1, #54
 	mov	r2, #0
 	bl	fseek
 	cmp	r0, #0
-	beq	.L29
-	ldr	r0, .L37+12
+	beq	.L26
+	ldr	r0, .L34+12
 	bl	perror
-.L29:
+.L26:
 	mov	r0, r6
 	mov	r1, #1024
 	mov	r2, #1
 	bl	fseek
 	cmp	r0, #0
-	beq	.L30
-	ldr	r0, .L37+16
+	beq	.L27
+	ldr	r0, .L34+16
 	bl	perror
-	b	.L30
-.L32:
-	mov	r0, r6
-	bl	fgetc
-	cmn	r0, #1
-	beq	.L31
-	str	r0, [r5], #4
+	b	.L27
+.L29:
+	mov	r0, #0
+	mov	r1, r8
+	mov	r2, r7
+	mov	r3, r6
+	bl	fread
+	cmp	r0, #0
+	ble	.L28
+	mov	r3, #0
+	ldr	r3, [r3, #0]
+	str	r3, [r5], #4
 	add	r4, r4, #1
-	cmp	r4, #320
-	bne	.L32
-.L31:
-	add	r7, r7, #1
-	cmp	r7, #240
-	bne	.L33
+	cmp	r4, #80
+	bne	.L29
+.L28:
+	add	sl, sl, #1
+	cmp	sl, #240
+	bne	.L30
 	mov	r0, r6
 	bl	fclose
-	ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, pc}
-.L33:
-	mov	r3, r7, asl #8
-	mov	r2, r7, asl #10
-	add	r3, r3, r2
-	add	r5, r8, r3
-	mov	r4, sl
-	b	.L32
+	ldmfd	sp!, {r3, r4, r5, r6, r7, r8, r9, sl, fp, pc}
 .L30:
-	mov	r7, #0
-	ldr	r8, .L37+20
-	mov	sl, r7
-	b	.L33
-.L38:
+	mov	r3, sl, asl #6
+	mov	r2, sl, asl #8
+	add	r3, r3, r2
+	add	r5, r9, r3
+	mov	r4, fp
+	b	.L29
+.L27:
+	mov	sl, #0
+	ldr	r9, .L34+20
+	mov	fp, sl
+	mov	r8, #4
+	mov	r7, #1
+	b	.L30
+.L35:
 	.align	2
-.L37:
+.L34:
 	.word	stdout
 	.word	.LC0
 	.word	.LC1
@@ -361,90 +358,92 @@ get_image:
 	.global	main
 	.type	main, %function
 main:
-	@ args = 0, pretend = 0, frame = 272
+	@ args = 0, pretend = 0, frame = 528
 	@ frame_needed = 0, uses_anonymous_args = 0
 	stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
-	sub	sp, sp, #276
+	sub	sp, sp, #532
 	mov	r3, r0
 	cmp	r0, #2
-	beq	.L40
-	ldr	r0, .L63
+	beq	.L37
+	ldr	r0, .L60
 	sub	r1, r3, #1
 	bl	printf
 	mov	r0, #1
-	b	.L41
-.L40:
+	b	.L38
+.L37:
 	mov	r4, r1
-	ldr	r0, .L63+4
+	ldr	r0, .L60+4
 	ldr	r1, [r4, #4]!
 	bl	printf
-	ldr	r0, .L63+8
+	ldr	r0, .L60+8
 	bl	puts
 	ldr	r0, [r4, #0]
 	bl	get_image
-	mov	r5, #0
-	ldr	r8, .L63+12
-	ldr	r9, .L63+16
-	add	r3, r8, #32
-	ldr	fp, .L63+20
-	add	sl, sp, #16
-	str	r3, [sp, #8]
-	str	r5, [sp, #4]
-	b	.L42
-.L47:
-	mov	r6, r7
-	mov	r0, r7
-	ldr	r1, [sp, #12]
-	bl	get_next_group
-	mov	r4, r8
-.L43:
-	mov	r0, r4
-	bl	loefflers
-	add	r4, r4, #32
-	cmp	r4, r9
-	bne	.L43
-	mov	r0, r8
-	mov	r1, sl
-	bl	transpose
-	mov	r4, sl
+	mov	r3, #0
+	str	r3, [sp, #12]
+	add	sl, sp, #272
+	add	r9, sp, #16
+	mov	r7, sl
+	ldr	r8, .L60+12
+	mov	fp, r9
+	str	sl, [sp, #8]
+	mov	r3, #0
+	str	r3, [sp, #4]
+	b	.L39
 .L44:
+	mov	r0, r5, asl #1
+	mov	r1, r6
+	mov	r2, r7
+	bl	get_next_group
+	mov	r4, r7
+.L40:
 	mov	r0, r4
 	bl	loefflers
 	add	r4, r4, #32
-	add	r3, sp, #272
+	add	r3, sp, #528
 	cmp	r4, r3
-	bne	.L44
-	mov	r0, sl
-	mov	r1, r8
+	bne	.L40
+	mov	r0, r7
+	mov	r1, fp
 	bl	transpose
+	mov	r4, fp
+.L41:
+	mov	r0, r4
+	bl	loefflers
+	add	r4, r4, #32
+	cmp	sl, r4
+	bne	.L41
+	mov	lr, r5, asl #3
 	ldr	r0, [sp, #8]
 	ldr	ip, [sp, #4]
-	b	.L45
-.L46:
-	ldr	r3, [r1], #4
+	b	.L42
+.L43:
+	ldr	r3, [r1], #32
 	str	r3, [r2], #4
 	cmp	r1, r0
-	bne	.L46
+	bne	.L43
 	add	ip, ip, #1
-	add	r0, r0, #32
+	add	r0, r0, #4
 	cmp	ip, #8
-	bne	.L45
-	add	r7, r7, #8
-	cmp	r7, #320
-	bne	.L47
-	add	r5, r5, #8
-	cmp	r5, #240
 	bne	.L42
-	ldr	r0, .L63+24
+	add	r5, r5, #1
+	cmp	r5, #40
+	bne	.L44
+	ldr	r3, [sp, #12]
+	add	r3, r3, #1
+	str	r3, [sp, #12]
+	cmp	r3, #30
+	bne	.L39
+	ldr	r0, .L60+16
 	bl	puts
-	sub	r5, r5, #240
-	ldr	sl, .L63+20
+	sub	r5, r5, #40
+	ldr	sl, .L60+12
 	mov	r9, r5
-	ldr	fp, .L63+28
+	ldr	fp, .L60+20
 	mov	r7, #0
-	ldr	r8, .L63+32
-	b	.L48
-.L49:
+	ldr	r8, .L60+24
+	b	.L45
+.L46:
 	ldr	r0, [r6], #4
 	bl	__aeabi_i2d
 	mov	r2, r7
@@ -456,23 +455,23 @@ main:
 	bl	printf
 	add	r4, r4, #1
 	cmp	r4, #8
-	bne	.L49
+	bne	.L46
 	mov	r0, #10
 	bl	putchar
 	add	r5, r5, #1
 	cmp	r5, #8
-	bne	.L48
-	ldr	r0, .L63+36
+	bne	.L45
+	ldr	r0, .L60+28
 	bl	puts
-	ldr	r6, .L63+40
+	ldr	r6, .L60+32
 	add	r5, r5, #112
-	ldr	sl, .L63+20
-	ldr	r9, .L63+28
+	ldr	sl, .L60+12
+	ldr	r9, .L60+20
 	mov	r7, #0
-	ldr	r8, .L63+32
+	ldr	r8, .L60+24
 	mov	fp, #10
-	b	.L50
-.L51:
+	b	.L47
+.L48:
 	ldr	r0, [r4], #4
 	bl	__aeabi_i2d
 	mov	r2, r7
@@ -482,55 +481,54 @@ main:
 	mov	r3, r1
 	mov	r0, r9
 	bl	printf
-	cmp	r4, r6
-	bne	.L51
+	cmp	r6, r4
+	bne	.L48
 	mov	r0, fp
 	bl	putchar
 	add	r5, r5, #1
 	add	r6, r6, #1280
 	cmp	r5, #128
-	bne	.L50
+	bne	.L47
 	mov	r0, #0
-.L41:
-	add	sp, sp, #276
+.L38:
+	add	sp, sp, #532
 	ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
-.L50:
+.L47:
 	mov	r3, r5, asl #8
 	mov	r2, r5, asl #10
 	add	r3, r3, r2
 	add	r3, r3, #640
 	add	r4, sl, r3
-	b	.L51
-.L48:
+	b	.L48
+.L45:
 	mov	r3, r5, asl #8
 	mov	r2, r5, asl #10
 	add	r3, r3, r2
 	add	r6, sl, r3
 	mov	r4, r9
-	b	.L49
-.L45:
-	mov	r3, ip, asl #5
-	add	r1, r8, r3
-	add	r2, ip, r5
+	b	.L46
+.L42:
+	mov	r3, ip, asl #2
+	add	r1, r9, r3
+	add	r2, ip, r6
 	mov	r3, r2, asl #6
 	mov	r2, r2, asl #8
 	add	r3, r3, r2
-	add	r3, r3, r6
+	add	r3, r3, lr
 	mov	r3, r3, asl #2
-	add	r2, fp, r3
-	b	.L46
-.L42:
-	str	r5, [sp, #12]
-	mov	r7, #0
-	b	.L47
-.L64:
+	add	r2, r8, r3
+	b	.L43
+.L39:
+	ldr	r3, [sp, #12]
+	mov	r6, r3, asl #3
+	mov	r5, #0
+	b	.L44
+.L61:
 	.align	2
-.L63:
+.L60:
 	.word	.LC4
 	.word	.LC5
 	.word	.LC6
-	.word	g_current_group
-	.word	g_current_group+256
 	.word	g_output_matrix
 	.word	.LC7
 	.word	.LC8
@@ -546,9 +544,8 @@ main:
 	.global	ROTATE_CONST_O2
 	.global	ROTATE_CONST
 	.global	END_SCALE
-	.comm	g_pixel_matrix,307200,4
+	.comm	g_pixel_matrix,76800,4
 	.comm	g_output_matrix,307200,4
-	.comm	g_current_group,256,4
 	.section	.rodata
 	.align	2
 .LANCHOR0 = . + 0
@@ -581,7 +578,7 @@ IMAGE_HEIGHT:
 	.type	IMAGE_WIDTH, %object
 	.size	IMAGE_WIDTH, 4
 IMAGE_WIDTH:
-	.word	320
+	.word	80
 	.type	SQRT2, %object
 	.size	SQRT2, 4
 SQRT2:

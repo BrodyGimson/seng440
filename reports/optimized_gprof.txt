@@ -3,23 +3,17 @@ Flat profile:
 Each sample counts as 0.01 seconds.
   %   cumulative   self              self     total           
  time   seconds   seconds    calls   s/call   s/call  name    
- 38.19     54.71    54.71                             mcount_internal
- 26.06     92.04    37.33                             getc
- 14.40    112.67    20.63                             __gnu_mcount_nc
-  8.33    124.60    11.93 19200000     0.00     0.00  loefflers
-  5.42    132.36     7.76 192000000     0.00     0.00  reflector
-  2.41    135.81     3.45     1000     0.00     0.00  get_image
-  1.80    138.39     2.58                             __aeabi_read_tp
-  1.65    140.75     2.36 57600000     0.00     0.00  rotator
-  0.82    141.93     1.18 38400000     0.00     0.00  scale_up
-  0.61    142.81     0.88        1     0.88    27.96  main
-  0.15    143.03     0.22  1200000     0.00     0.00  transpose
-  0.13    143.21     0.18  1200000     0.00     0.00  get_next_group
-  0.01    143.23     0.02                             read
-  0.01    143.24     0.01                             _IO_default_uflow
-  0.01    143.25     0.01                             _IO_file_open
-  0.01    143.26     0.01                             _int_free
-  0.01    143.27     0.01                             cfree
+ 56.01     56.77    56.77                             mcount_internal
+ 19.75     76.79    20.02                             __gnu_mcount_nc
+ 12.39     89.35    12.56 19200000     0.00     0.00  loefflers
+  7.17     96.62     7.27 192000000     0.00     0.00  reflector
+  2.01     98.66     2.04 57600000     0.00     0.00  rotator
+  1.25     99.93     1.27 38400000     0.00     0.00  scale_up
+  0.95    100.89     0.96        1     0.96    24.50  main
+  0.21    101.10     0.21  1200000     0.00     0.00  transpose
+  0.19    101.29     0.19  1200000     0.00     0.00  get_next_group
+  0.06    101.35     0.06                             getc
+  0.00    101.35     0.00        1     0.00     0.00  get_image
 
  %         the percentage of the total running time of the
 time       program used by this function.
@@ -57,70 +51,52 @@ notice and this notice are preserved.
 		     Call graph (explanation follows)
 
 
-granularity: each sample hit covers 4 byte(s) for 0.01% of 143.27 seconds
+granularity: each sample hit covers 4 byte(s) for 0.01% of 101.35 seconds
 
 index % time    self  children    called     name
                                                  <spontaneous>
-[1]     38.2   54.71    0.00                 mcount_internal [1]
+[1]     56.0   56.77    0.00                 mcount_internal [1]
+-----------------------------------------------
+                0.96   23.54       1/1           __libc_start_main [3]
+[2]     24.2    0.96   23.54       1         main [2]
+               12.56   10.58 19200000/19200000     loefflers [4]
+                0.21    0.00 1200000/1200000     transpose [9]
+                0.19    0.00 1200000/1200000     get_next_group [10]
+                0.00    0.00       1/1           get_image [12]
 -----------------------------------------------
                                                  <spontaneous>
-[2]     26.1   37.33    0.00                 getc [2]
+[3]     24.2    0.00   24.50                 __libc_start_main [3]
+                0.96   23.54       1/1           main [2]
 -----------------------------------------------
-                0.88   27.08       1/1           __libc_start_main [4]
-[3]     19.5    0.88   27.08       1         main [3]
-               11.93   11.30 19200000/19200000     loefflers [5]
-                3.45    0.00    1000/1000        get_image [8]
-                0.22    0.00 1200000/1200000     transpose [12]
-                0.18    0.00 1200000/1200000     get_next_group [13]
------------------------------------------------
-                                                 <spontaneous>
-[4]     19.5    0.00   27.96                 __libc_start_main [4]
-                0.88   27.08       1/1           main [3]
------------------------------------------------
-               11.93   11.30 19200000/19200000     main [3]
-[5]     16.2   11.93   11.30 19200000         loefflers [5]
-                7.76    0.00 192000000/192000000     reflector [7]
-                2.36    0.00 57600000/57600000     rotator [10]
-                1.18    0.00 38400000/38400000     scale_up [11]
+               12.56   10.58 19200000/19200000     main [2]
+[4]     22.8   12.56   10.58 19200000         loefflers [4]
+                7.27    0.00 192000000/192000000     reflector [6]
+                2.04    0.00 57600000/57600000     rotator [7]
+                1.27    0.00 38400000/38400000     scale_up [8]
 -----------------------------------------------
                                                  <spontaneous>
-[6]     14.4   20.63    0.00                 __gnu_mcount_nc [6]
+[5]     19.8   20.02    0.00                 __gnu_mcount_nc [5]
 -----------------------------------------------
-                7.76    0.00 192000000/192000000     loefflers [5]
-[7]      5.4    7.76    0.00 192000000         reflector [7]
+                7.27    0.00 192000000/192000000     loefflers [4]
+[6]      7.2    7.27    0.00 192000000         reflector [6]
 -----------------------------------------------
-                3.45    0.00    1000/1000        main [3]
-[8]      2.4    3.45    0.00    1000         get_image [8]
+                2.04    0.00 57600000/57600000     loefflers [4]
+[7]      2.0    2.04    0.00 57600000         rotator [7]
 -----------------------------------------------
-                                                 <spontaneous>
-[9]      1.8    2.58    0.00                 __aeabi_read_tp [9]
+                1.27    0.00 38400000/38400000     loefflers [4]
+[8]      1.3    1.27    0.00 38400000         scale_up [8]
 -----------------------------------------------
-                2.36    0.00 57600000/57600000     loefflers [5]
-[10]     1.6    2.36    0.00 57600000         rotator [10]
+                0.21    0.00 1200000/1200000     main [2]
+[9]      0.2    0.21    0.00 1200000         transpose [9]
 -----------------------------------------------
-                1.18    0.00 38400000/38400000     loefflers [5]
-[11]     0.8    1.18    0.00 38400000         scale_up [11]
------------------------------------------------
-                0.22    0.00 1200000/1200000     main [3]
-[12]     0.2    0.22    0.00 1200000         transpose [12]
------------------------------------------------
-                0.18    0.00 1200000/1200000     main [3]
-[13]     0.1    0.18    0.00 1200000         get_next_group [13]
+                0.19    0.00 1200000/1200000     main [2]
+[10]     0.2    0.19    0.00 1200000         get_next_group [10]
 -----------------------------------------------
                                                  <spontaneous>
-[14]     0.0    0.02    0.00                 read [14]
+[11]     0.1    0.06    0.00                 getc [11]
 -----------------------------------------------
-                                                 <spontaneous>
-[15]     0.0    0.01    0.00                 cfree [15]
------------------------------------------------
-                                                 <spontaneous>
-[16]     0.0    0.01    0.00                 _IO_default_uflow [16]
------------------------------------------------
-                                                 <spontaneous>
-[17]     0.0    0.01    0.00                 _IO_file_open [17]
------------------------------------------------
-                                                 <spontaneous>
-[18]     0.0    0.01    0.00                 _int_free [18]
+                0.00    0.00       1/1           main [2]
+[12]     0.0    0.00    0.00       1         get_image [12]
 -----------------------------------------------
 
  This table describes the call tree of the program, and was sorted by
@@ -213,9 +189,7 @@ notice and this notice are preserved.
 
 Index by function name
 
-  [16] _IO_default_uflow       [8] get_image              [14] read
-  [17] _IO_file_open          [13] get_next_group          [7] reflector
-   [9] __aeabi_read_tp         [2] getc                   [10] rotator
-   [6] __gnu_mcount_nc         [5] loefflers              [11] scale_up
-  [18] _int_free               [3] main                   [12] transpose
-  [15] cfree                   [1] mcount_internal
+   [5] __gnu_mcount_nc         [4] loefflers               [7] rotator
+  [12] get_image               [2] main                    [8] scale_up
+  [10] get_next_group          [1] mcount_internal         [9] transpose
+  [11] getc                    [6] reflector

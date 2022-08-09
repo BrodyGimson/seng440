@@ -63,7 +63,7 @@ ROTATE_CONST:
 	.type	END_SCALE, %object
 	.size	END_SCALE, 4
 END_SCALE:
-	.word	16384
+	.word	1024
 	.align	2
 .LC0:
 	.ascii	"rb\000"
@@ -565,43 +565,43 @@ loefflers:
 	mov	r3, r0
 	str	r3, [fp, #-12]
 	ldr	r3, [fp, #-36]
-	mov	r2, r3, asl #7
+	mov	r2, r3, asl #5
 	ldr	r3, [fp, #-40]
 	str	r2, [r3, #0]
 	ldr	r3, [fp, #-40]
 	add	r2, r3, #16
 	ldr	r3, [fp, #-32]
-	mov	r3, r3, asl #7
+	mov	r3, r3, asl #5
 	str	r3, [r2, #0]
 	ldr	r3, [fp, #-40]
 	add	r2, r3, #8
 	ldr	r3, [fp, #-28]
-	mov	r3, r3, asr #7
+	mov	r3, r3, asr #9
 	str	r3, [r2, #0]
 	ldr	r3, [fp, #-40]
 	add	r2, r3, #24
 	ldr	r3, [fp, #-24]
-	mov	r3, r3, asr #7
+	mov	r3, r3, asr #9
 	str	r3, [r2, #0]
 	ldr	r3, [fp, #-40]
 	add	r2, r3, #28
 	ldr	r3, [fp, #-20]
-	mov	r3, r3, asr #7
+	mov	r3, r3, asr #9
 	str	r3, [r2, #0]
 	ldr	r3, [fp, #-40]
 	add	r2, r3, #12
 	ldr	r3, [fp, #-16]
-	mov	r3, r3, asr #7
+	mov	r3, r3, asr #9
 	str	r3, [r2, #0]
 	ldr	r3, [fp, #-40]
 	add	r2, r3, #20
 	ldr	r3, [fp, #-12]
-	mov	r3, r3, asr #7
+	mov	r3, r3, asr #9
 	str	r3, [r2, #0]
 	ldr	r3, [fp, #-40]
 	add	r2, r3, #4
 	ldr	r3, [fp, #-8]
-	mov	r3, r3, asr #7
+	mov	r3, r3, asr #9
 	str	r3, [r2, #0]
 	sub	sp, fp, #4
 	ldmfd	sp!, {fp, pc}
@@ -672,9 +672,9 @@ main:
 	str	r3, [fp, #-56]
 	b	.L43
 .L52:
-	ldr	r3, [fp, #-60]
-	mov	r2, r3, asl #3
 	ldr	r3, [fp, #-56]
+	mov	r2, r3, asl #3
+	ldr	r3, [fp, #-60]
 	mov	r3, r3, asl #3
 	mov	r0, r2
 	mov	r1, r3
@@ -769,14 +769,14 @@ main:
 	str	r3, [fp, #-56]
 .L43:
 	ldr	r3, [fp, #-56]
-	cmp	r3, #29
+	cmp	r3, #39
 	ble	.L52
 	ldr	r3, [fp, #-60]
 	add	r3, r3, #1
 	str	r3, [fp, #-60]
 .L42:
 	ldr	r3, [fp, #-60]
-	cmp	r3, #39
+	cmp	r3, #29
 	ble	.L53
 	ldr	r0, .L63+20
 	bl	puts

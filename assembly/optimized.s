@@ -204,16 +204,16 @@ loefflers:
 	add	r3, sp, #56
 	bl	rotator
 	ldr	r3, [sp, #48]
-	mov	r3, r3, asl #7
+	mov	r3, r3, asl #5
 	str	r3, [r4, #0]
 	ldr	r3, [sp, #52]
-	mov	r3, r3, asl #7
+	mov	r3, r3, asl #5
 	str	r3, [r5, #0]
 	ldr	r3, [sp, #56]
-	mov	r3, r3, asr #7
+	mov	r3, r3, asr #9
 	str	r3, [r6, #0]
 	ldr	r3, [sp, #60]
-	mov	r3, r3, asr #7
+	mov	r3, r3, asr #9
 	str	r3, [r7, #0]
 	add	r5, sp, #32
 	add	r4, sp, #44
@@ -251,14 +251,14 @@ loefflers:
 	ldr	r0, [sp, #72]
 	bl	scale_up
 	ldr	r3, [sp, #32]
-	mov	r3, r3, asr #7
+	mov	r3, r3, asr #9
 	str	r3, [fp, #0]
-	mov	r4, r4, asr #7
+	mov	r4, r4, asr #9
 	str	r4, [sl, #0]
-	mov	r0, r0, asr #7
+	mov	r0, r0, asr #9
 	str	r0, [r9, #0]
 	ldr	r3, [sp, #44]
-	mov	r3, r3, asr #7
+	mov	r3, r3, asr #9
 	ldr	r2, [sp, #12]
 	str	r3, [r2, #0]
 	add	sp, sp, #84
@@ -378,8 +378,8 @@ main:
 	b	.L42
 .L48:
 	mov	r5, r7, asl #3
-	mov	r0, r6
-	mov	r1, r5
+	mov	r0, r5
+	mov	r1, r6
 	mov	r2, r8
 	bl	get_next_group
 	mov	r4, r8
@@ -411,12 +411,12 @@ main:
 	cmp	ip, #8
 	bne	.L47
 	add	r7, r7, #1
-	cmp	r7, #30
+	cmp	r7, #40
 	bne	.L48
 	ldr	r3, [sp, #12]
 	add	r3, r3, #1
 	str	r3, [sp, #12]
-	cmp	r3, #40
+	cmp	r3, #30
 	bne	.L42
 	ldr	r0, .L66+16
 	bl	puts
@@ -519,7 +519,7 @@ main:
 	.word	g_output_matrix
 	.word	.LC7
 	.word	.LC8
-	.word	1058013184
+	.word	1062207488
 	.word	.LC9
 	.word	g_output_matrix+154272
 	.size	main, .-main
@@ -573,7 +573,7 @@ SQRT2:
 	.type	END_SCALE, %object
 	.size	END_SCALE, 4
 END_SCALE:
-	.word	16384
+	.word	1024
 	.section	.rodata.str1.4,"aMS",%progbits,1
 	.align	2
 .LC0:
