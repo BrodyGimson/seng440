@@ -83,24 +83,60 @@ void get_image(char *p_image_name)
     }
 }
 
-void transpose(int32_t orig[][8], int32_t trans[][8])
+void transpose(int32x2x4_t orig[8], int32x2x4_t trans[8])
 {
+    int32_t temp_trans[8][4][2];
+    int32_t temp_orig[8][4][2];
+    for (int i = 0; i < 8; ++i){
+	vst4_s32(temp_orig[i], orig[i]);
+    }
+
+    /*
     for (int i = 0; i < 8; ++i)
     {
-        for (int j = 0; j < 8; ++j) 
+        for (int j = 0; j < 8; ++j)
         {
-            trans[i][j] = orig[j][i];
+		printf("%d, ", temp_orig[i][j>>1][j%2]);
+	}
+	printf("\n");
+    }
+    */
+
+    for (int i = 0; i < 8; ++i)
+    {
+	for (int j = 0; j < 8; ++j) 
+        {
+            temp_trans[j][i>>1][i%2] = temp_orig[i][j>>1][j%2];
         }
+    }
+
+    //Required to ensure temp_trans is properly stored to the neon var
+    for (int i = 0; i < 8; ++i)
+    {
+	trans[i] = vld4_s32(temp_trans[i]);
     }
 }
 
 void get_next_group(int current_x, int current_y) 
 {
+    int32_t temp_group[4][2];
     for (int i = 0; i < 8; ++i) 
     {
-	for (int j = j; j < 8; ++j){
-        	vst1_s32(&g_pixel_matrix[current_y + i][current_x + j], g_current_group[i].val[j]);
+	for (int j = 0; j < 8; j += 2){
+        	int32_t pix_group[2];
+		pix_group[0] = g_pixel_matrix[current_y + i][current_x + j];
+		pix_group[1] = g_pixel_matrix[current_y + i][current_x + j+1];
+		
+		temp_group[j>>1][0] = pix_group[0];
+		temp_group[j>>1][1] = pix_group[1];
+		//printf("\n %d \n", temp_group[j>>1][0]);
 	}
+	//printf("\n %d \n", temp_group[2][0]);
+	//printf("%d, %d", g_current_group[0], vld4_s32(temp_group));
+	g_current_group[i] = vld4_s32(temp_group);
+	int32_t test[4][2];
+	vst4_s32(test, g_current_group[i]);
+	//printf("\n %d \n", test[2][0]);
     }
 }
 
@@ -126,15 +162,16 @@ int32_t scale_up(int32_t input)
     return output;
 }
 
-void * loefflers(int32_t * x)
+int32x2x4_t loefflers(int32x2x4_t neon_x)
 {
     int32_t tmp_output[8];
-    
+    int32_t x[4][2];
+    vst4_s32(x, neon_x);
     //stage 1
-    reflector(x[0], x[7], &tmp_output[0], &tmp_output[7]);
-    reflector(x[1], x[6], &tmp_output[1], &tmp_output[6]);
-    reflector(x[2], x[5], &tmp_output[2], &tmp_output[5]);
-    reflector(x[3], x[4], &tmp_output[3], &tmp_output[4]);
+    reflector(x[0][0], x[3][1], &tmp_output[0], &tmp_output[7]);
+    reflector(x[0][1], x[3][0], &tmp_output[1], &tmp_output[6]);
+    reflector(x[1][0], x[2][1], &tmp_output[2], &tmp_output[5]);
+    reflector(x[1][1], x[2][0], &tmp_output[3], &tmp_output[4]);
     
     //stage 2
     reflector(tmp_output[0], tmp_output[3], &tmp_output[0], &tmp_output[3]);
@@ -155,19 +192,21 @@ void * loefflers(int32_t * x)
     tmp_output[6] = scale_up(tmp_output[6]);  
     
     // unscramble values
-    x[0] = tmp_output[0] << 7;
-    x[4] = tmp_output[1] << 7;
-    x[2] = tmp_output[2] >> 7;
-    x[6] = tmp_output[3] >> 7;
-    x[7] = tmp_output[4] >> 7;
-    x[3] = tmp_output[5] >> 7;
-    x[5] = tmp_output[6] >> 7;
-    x[1] = tmp_output[7] >> 7;
+    x[0][0] = tmp_output[0] << 7;
+    x[2][0] = tmp_output[1] << 7;
+    x[1][0] = tmp_output[2] >> 7;
+    x[3][0] = tmp_output[3] >> 7;
+    x[3][1] = tmp_output[4] >> 7;
+    x[1][1] = tmp_output[5] >> 7;
+    x[2][1] = tmp_output[6] >> 7;
+    x[0][1] = tmp_output[7] >> 7;
+    neon_x = vld4_s32(x);
+    return neon_x;
 }
 
 int main(int argc, char *argv[])
 {
-    int32_t current_group_trans[8][8];
+    int32x2x4_t current_group_trans[8];
     
     if (argc != 2)
     {
@@ -181,17 +220,31 @@ int main(int argc, char *argv[])
 
     get_image(argv[1]);
 
-    get_next_group(0, 0);
-
+    get_next_group(160, 120);
+    
     for (int i = 0; i < 8; ++i) 
     {
         for (int j = 0; j < 8; ++j) 
         {
-            printf("%d, ", g_current_group[i].val[j]);
+		int32_t output[4][2];
+            	vst4_s32(output, g_current_group[i]);
+		//printf("j>>1: %d, j%2: %d value: ", j>>1, j%2);
+		printf("%d, ", output[j>>1][j%2]);
         }
         printf("\n");
     }
-
+    printf("\n");
+    get_next_group(160, 120);
+    transpose(g_current_group, current_group_trans);
+    
+    for(int i = 0; i < 8; ++i){
+	for(int j = 0; j < 8; ++j){
+		int32_t output[4][2];
+		vst4_s32(output, current_group_trans[i]);
+		printf("%d, ", output[j>>1][j%2]);
+	}
+	printf("\n");
+    }
     
     for (int x = 0; x < 40; ++x)
     {
@@ -200,25 +253,29 @@ int main(int argc, char *argv[])
     		get_next_group(8*x, 8*y);
     		
     		for (int i = 0; i < 8; ++i)
-            {
-    			loefflers(g_current_group[i]);
+            	{
+    			g_current_group[i] = loefflers(g_current_group[i]);
     		}	
     		
     		transpose(g_current_group, current_group_trans);
     		
     		for (int i = 0; i < 8; ++i)
-            {
-    			loefflers(current_group_trans[i]);
+            	{
+    			current_group_trans[i] = loefflers(current_group_trans[i]);
     		}
     		
     		transpose(current_group_trans, g_current_group);
 
     		for (int i = 0; i < 8; ++i) 
-            {
-        		for (int j = 0; j < 8; ++j) 
-                {
-            		g_output_matrix[x*8 + i][y*8 + j] = g_current_group[i][j];
+            	{
+        		int32_t temp_output[4][2];
+			vst4_s32(temp_output, g_current_group[i]);
+			for (int j = 0; j < 8; ++j) 
+                	{
+				//printf("%d ", temp_output[j>>1][j%2]);
+            			g_output_matrix[x*8 + i][y*8 + j] = temp_output[j>>1][j%2];
         		}
+			//printf("\n");
     		}
     	}
     }
