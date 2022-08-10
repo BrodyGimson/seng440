@@ -26,6 +26,7 @@ int const ROTATE_CONST_p_output_1[3] = {-12873, -4520, 12539};      // Constants
 int const ROTATE_CONST_p_output_2[3] = {-19266, -22725, -30273};    // Constants used for output 2 in rotators
 int const END_SCALE = 1024;                                        // Ending scale factor
 
+
 // Barr-C: Global variables should start with "g_" (7.1.j)
 int32_t g_pixel_matrix[240][320];
 int32_t g_output_matrix[240][320];

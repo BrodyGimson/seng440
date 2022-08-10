@@ -8,7 +8,7 @@
 	.eabi_attribute 26, 2
 	.eabi_attribute 30, 6
 	.eabi_attribute 18, 4
-	.file	"unoptimized.c"
+	.file	"optimized.c"
 	.global	IMAGE_SIZE
 	.section	.rodata
 	.align	2
@@ -239,14 +239,15 @@ transpose:
 	.global	get_next_group
 	.type	get_next_group, %function
 get_next_group:
-	@ args = 0, pretend = 0, frame = 16
+	@ args = 0, pretend = 0, frame = 24
 	@ frame_needed = 1, uses_anonymous_args = 0
 	@ link register save eliminated.
 	stmfd	sp!, {r4, r5, fp}
 	add	fp, sp, #8
-	sub	sp, sp, #20
+	sub	sp, sp, #28
 	str	r0, [fp, #-24]
 	str	r1, [fp, #-28]
+	str	r2, [fp, #-32]
 	mov	r3, #0
 	str	r3, [fp, #-20]
 	b	.L20
@@ -255,7 +256,10 @@ get_next_group:
 	str	r3, [fp, #-16]
 	b	.L21
 .L22:
-	ldr	r4, [fp, #-20]
+	ldr	r3, [fp, #-20]
+	mov	r2, r3, asl #5
+	ldr	r3, [fp, #-32]
+	add	r4, r3, r2
 	ldr	r5, [fp, #-16]
 	ldr	r2, [fp, #-28]
 	ldr	r3, [fp, #-20]
@@ -269,11 +273,8 @@ get_next_group:
 	mov	r2, r3, asl #2
 	add	r3, r3, r2
 	add	r3, r3, r0
-	ldr	r1, [ip, r3, asl #2]
-	ldr	r2, .L25+4
-	mov	r3, r4, asl #3
-	add	r3, r3, r5
-	str	r1, [r2, r3, asl #2]
+	ldr	r3, [ip, r3, asl #2]
+	str	r3, [r4, r5, asl #2]
 	ldr	r3, [fp, #-16]
 	add	r3, r3, #1
 	str	r3, [fp, #-16]
@@ -295,7 +296,6 @@ get_next_group:
 	.align	2
 .L25:
 	.word	g_pixel_matrix
-	.word	g_current_group
 	.size	get_next_group, .-get_next_group
 	.align	2
 	.global	reflector
@@ -412,15 +412,15 @@ scale_up:
 	.global	loefflers
 	.type	loefflers, %function
 loefflers:
-	@ args = 0, pretend = 0, frame = 40
+	@ args = 0, pretend = 0, frame = 72
 	@ frame_needed = 1, uses_anonymous_args = 0
 	stmfd	sp!, {fp, lr}
 	add	fp, sp, #4
-	sub	sp, sp, #48
-	str	r0, [fp, #-40]
-	ldr	r3, [fp, #-40]
+	sub	sp, sp, #80
+	str	r0, [fp, #-72]
+	ldr	r3, [fp, #-72]
 	ldr	r1, [r3, #0]
-	ldr	r3, [fp, #-40]
+	ldr	r3, [fp, #-72]
 	add	r3, r3, #28
 	ldr	r2, [r3, #0]
 	sub	ip, fp, #36
@@ -430,10 +430,10 @@ loefflers:
 	mov	r1, r2
 	mov	r2, ip
 	bl	reflector
-	ldr	r3, [fp, #-40]
+	ldr	r3, [fp, #-72]
 	add	r3, r3, #4
 	ldr	r1, [r3, #0]
-	ldr	r3, [fp, #-40]
+	ldr	r3, [fp, #-72]
 	add	r3, r3, #24
 	ldr	ip, [r3, #0]
 	sub	r3, fp, #36
@@ -443,10 +443,10 @@ loefflers:
 	mov	r0, r1
 	mov	r1, ip
 	bl	reflector
-	ldr	r3, [fp, #-40]
+	ldr	r3, [fp, #-72]
 	add	r3, r3, #8
 	ldr	r1, [r3, #0]
-	ldr	r3, [fp, #-40]
+	ldr	r3, [fp, #-72]
 	add	r3, r3, #20
 	ldr	ip, [r3, #0]
 	sub	r3, fp, #36
@@ -456,10 +456,10 @@ loefflers:
 	mov	r0, r1
 	mov	r1, ip
 	bl	reflector
-	ldr	r3, [fp, #-40]
+	ldr	r3, [fp, #-72]
 	add	r3, r3, #12
 	ldr	r1, [r3, #0]
-	ldr	r3, [fp, #-40]
+	ldr	r3, [fp, #-72]
 	add	r3, r3, #16
 	ldr	ip, [r3, #0]
 	sub	r3, fp, #36
@@ -471,53 +471,31 @@ loefflers:
 	bl	reflector
 	ldr	r2, [fp, #-36]
 	ldr	r1, [fp, #-24]
-	sub	ip, fp, #36
-	sub	r3, fp, #36
+	sub	ip, fp, #68
+	sub	r3, fp, #68
 	add	r3, r3, #12
 	mov	r0, r2
 	mov	r2, ip
 	bl	reflector
 	ldr	r1, [fp, #-32]
 	ldr	ip, [fp, #-28]
-	sub	r3, fp, #36
+	sub	r3, fp, #68
 	add	r2, r3, #4
-	sub	r3, fp, #36
+	sub	r3, fp, #68
 	add	r3, r3, #8
 	mov	r0, r1
 	mov	r1, ip
 	bl	reflector
-	ldr	r2, [fp, #-20]
-	ldr	r1, [fp, #-8]
-	sub	r3, fp, #36
-	add	ip, r3, #16
-	sub	r3, fp, #36
-	add	r3, r3, #28
-	str	r3, [sp, #0]
-	mov	r0, r2
-	mov	r2, #1
-	mov	r3, ip
-	bl	rotator
-	ldr	r2, [fp, #-16]
-	ldr	r1, [fp, #-12]
-	sub	r3, fp, #36
-	add	ip, r3, #20
-	sub	r3, fp, #36
-	add	r3, r3, #24
-	str	r3, [sp, #0]
-	mov	r0, r2
-	mov	r2, #0
-	mov	r3, ip
-	bl	rotator
-	ldr	r2, [fp, #-36]
-	ldr	r1, [fp, #-32]
+	ldr	r2, [fp, #-68]
+	ldr	r1, [fp, #-64]
 	sub	ip, fp, #36
 	sub	r3, fp, #36
 	add	r3, r3, #4
 	mov	r0, r2
 	mov	r2, ip
 	bl	reflector
-	ldr	r2, [fp, #-28]
-	ldr	r1, [fp, #-24]
+	ldr	r2, [fp, #-60]
+	ldr	r1, [fp, #-56]
 	sub	r3, fp, #36
 	add	ip, r3, #8
 	sub	r3, fp, #36
@@ -527,8 +505,49 @@ loefflers:
 	mov	r2, #2
 	mov	r3, ip
 	bl	rotator
-	ldr	r1, [fp, #-20]
-	ldr	ip, [fp, #-12]
+	ldr	r3, [fp, #-36]
+	mov	r2, r3, asl #5
+	ldr	r3, [fp, #-72]
+	str	r2, [r3, #0]
+	ldr	r3, [fp, #-72]
+	add	r2, r3, #16
+	ldr	r3, [fp, #-32]
+	mov	r3, r3, asl #5
+	str	r3, [r2, #0]
+	ldr	r3, [fp, #-72]
+	add	r2, r3, #8
+	ldr	r3, [fp, #-28]
+	mov	r3, r3, asr #9
+	str	r3, [r2, #0]
+	ldr	r3, [fp, #-72]
+	add	r2, r3, #24
+	ldr	r3, [fp, #-24]
+	mov	r3, r3, asr #9
+	str	r3, [r2, #0]
+	ldr	r2, [fp, #-20]
+	ldr	r1, [fp, #-8]
+	sub	r3, fp, #68
+	add	ip, r3, #16
+	sub	r3, fp, #68
+	add	r3, r3, #28
+	str	r3, [sp, #0]
+	mov	r0, r2
+	mov	r2, #1
+	mov	r3, ip
+	bl	rotator
+	ldr	r2, [fp, #-16]
+	ldr	r1, [fp, #-12]
+	sub	r3, fp, #68
+	add	ip, r3, #20
+	sub	r3, fp, #68
+	add	r3, r3, #24
+	str	r3, [sp, #0]
+	mov	r0, r2
+	mov	r2, #0
+	mov	r3, ip
+	bl	rotator
+	ldr	r1, [fp, #-52]
+	ldr	ip, [fp, #-44]
 	sub	r3, fp, #36
 	add	r2, r3, #16
 	sub	r3, fp, #36
@@ -536,8 +555,8 @@ loefflers:
 	mov	r0, r1
 	mov	r1, ip
 	bl	reflector
-	ldr	r1, [fp, #-8]
-	ldr	ip, [fp, #-16]
+	ldr	r1, [fp, #-40]
+	ldr	ip, [fp, #-48]
 	sub	r3, fp, #36
 	add	r2, r3, #28
 	sub	r3, fp, #36
@@ -547,9 +566,9 @@ loefflers:
 	bl	reflector
 	ldr	r1, [fp, #-8]
 	ldr	ip, [fp, #-20]
-	sub	r3, fp, #36
+	sub	r3, fp, #68
 	add	r2, r3, #28
-	sub	r3, fp, #36
+	sub	r3, fp, #68
 	add	r3, r3, #16
 	mov	r0, r1
 	mov	r1, ip
@@ -558,49 +577,30 @@ loefflers:
 	mov	r0, r3
 	bl	scale_up
 	mov	r3, r0
-	str	r3, [fp, #-16]
+	str	r3, [fp, #-48]
 	ldr	r3, [fp, #-12]
 	mov	r0, r3
 	bl	scale_up
 	mov	r3, r0
-	str	r3, [fp, #-12]
-	ldr	r3, [fp, #-36]
-	mov	r2, r3, asl #5
-	ldr	r3, [fp, #-40]
-	str	r2, [r3, #0]
-	ldr	r3, [fp, #-40]
-	add	r2, r3, #16
-	ldr	r3, [fp, #-32]
-	mov	r3, r3, asl #5
-	str	r3, [r2, #0]
-	ldr	r3, [fp, #-40]
-	add	r2, r3, #8
-	ldr	r3, [fp, #-28]
-	mov	r3, r3, asr #9
-	str	r3, [r2, #0]
-	ldr	r3, [fp, #-40]
-	add	r2, r3, #24
-	ldr	r3, [fp, #-24]
-	mov	r3, r3, asr #9
-	str	r3, [r2, #0]
-	ldr	r3, [fp, #-40]
+	str	r3, [fp, #-44]
+	ldr	r3, [fp, #-72]
 	add	r2, r3, #28
-	ldr	r3, [fp, #-20]
+	ldr	r3, [fp, #-52]
 	mov	r3, r3, asr #9
 	str	r3, [r2, #0]
-	ldr	r3, [fp, #-40]
+	ldr	r3, [fp, #-72]
 	add	r2, r3, #12
-	ldr	r3, [fp, #-16]
+	ldr	r3, [fp, #-48]
 	mov	r3, r3, asr #9
 	str	r3, [r2, #0]
-	ldr	r3, [fp, #-40]
+	ldr	r3, [fp, #-72]
 	add	r2, r3, #20
-	ldr	r3, [fp, #-12]
+	ldr	r3, [fp, #-44]
 	mov	r3, r3, asr #9
 	str	r3, [r2, #0]
-	ldr	r3, [fp, #-40]
+	ldr	r3, [fp, #-72]
 	add	r2, r3, #4
-	ldr	r3, [fp, #-8]
+	ldr	r3, [fp, #-40]
 	mov	r3, r3, asr #9
 	str	r3, [r2, #0]
 	sub	sp, fp, #4
@@ -632,26 +632,26 @@ loefflers:
 	.global	main
 	.type	main, %function
 main:
-	@ args = 0, pretend = 0, frame = 312
+	@ args = 0, pretend = 0, frame = 576
 	@ frame_needed = 1, uses_anonymous_args = 0
 	stmfd	sp!, {r4, r5, r6, fp, lr}
 	add	fp, sp, #16
-	sub	sp, sp, #316
-	str	r0, [fp, #-320]
-	str	r1, [fp, #-324]
-	ldr	r3, [fp, #-320]
+	sub	sp, sp, #580
+	str	r0, [fp, #-584]
+	str	r1, [fp, #-588]
+	ldr	r3, [fp, #-584]
 	cmp	r3, #2
 	beq	.L40
-	ldr	r3, [fp, #-320]
+	ldr	r3, [fp, #-584]
 	sub	r3, r3, #1
 	ldr	r0, .L63
 	mov	r1, r3
 	bl	printf
-	mov	r3, #1
-	str	r3, [fp, #-328]
+	mov	r1, #1
+	str	r1, [fp, #-592]
 	b	.L41
 .L40:
-	ldr	r3, [fp, #-324]
+	ldr	r3, [fp, #-588]
 	add	r3, r3, #4
 	ldr	r3, [r3, #0]
 	ldr	r0, .L63+4
@@ -659,7 +659,7 @@ main:
 	bl	printf
 	ldr	r0, .L63+8
 	bl	puts
-	ldr	r3, [fp, #-324]
+	ldr	r3, [fp, #-588]
 	add	r3, r3, #4
 	ldr	r3, [r3, #0]
 	mov	r0, r3
@@ -673,17 +673,21 @@ main:
 	b	.L43
 .L52:
 	ldr	r3, [fp, #-56]
-	mov	r2, r3, asl #3
+	mov	r3, r3, asl #3
+	str	r3, [fp, #-64]
 	ldr	r3, [fp, #-60]
 	mov	r3, r3, asl #3
-	mov	r0, r2
-	mov	r1, r3
+	str	r3, [fp, #-68]
+	sub	r3, fp, #324
+	ldr	r0, [fp, #-64]
+	ldr	r1, [fp, #-68]
+	mov	r2, r3
 	bl	get_next_group
 	mov	r3, #0
 	str	r3, [fp, #-52]
 	b	.L44
 .L45:
-	ldr	r2, .L63+12
+	sub	r2, fp, #324
 	ldr	r3, [fp, #-52]
 	mov	r3, r3, asl #5
 	add	r3, r2, r3
@@ -696,15 +700,16 @@ main:
 	ldr	r3, [fp, #-52]
 	cmp	r3, #7
 	ble	.L45
-	sub	r3, fp, #316
-	ldr	r0, .L63+12
-	mov	r1, r3
+	sub	r3, fp, #324
+	sub	r2, fp, #580
+	mov	r0, r3
+	mov	r1, r2
 	bl	transpose
 	mov	r3, #0
 	str	r3, [fp, #-48]
 	b	.L46
 .L47:
-	sub	r2, fp, #316
+	sub	r2, fp, #580
 	ldr	r3, [fp, #-48]
 	mov	r3, r3, asl #5
 	add	r3, r2, r3
@@ -717,10 +722,6 @@ main:
 	ldr	r3, [fp, #-48]
 	cmp	r3, #7
 	ble	.L47
-	sub	r3, fp, #316
-	mov	r0, r3
-	ldr	r1, .L63+12
-	bl	transpose
 	mov	r3, #0
 	str	r3, [fp, #-44]
 	b	.L48
@@ -729,20 +730,22 @@ main:
 	str	r3, [fp, #-40]
 	b	.L49
 .L50:
-	ldr	r3, [fp, #-60]
-	mov	r2, r3, asl #3
+	ldr	r2, [fp, #-68]
 	ldr	r3, [fp, #-44]
 	add	ip, r2, r3
-	ldr	r3, [fp, #-56]
-	mov	r2, r3, asl #3
+	ldr	r2, [fp, #-64]
 	ldr	r3, [fp, #-40]
 	add	lr, r2, r3
-	ldr	r3, [fp, #-44]
-	ldr	r2, [fp, #-40]
-	ldr	r1, .L63+12
+	ldr	r3, [fp, #-40]
+	ldr	r2, [fp, #-44]
 	mov	r3, r3, asl #3
 	add	r3, r3, r2
-	ldr	r1, [r1, r3, asl #2]
+	ldr	r2, .L63+12
+	mov	r3, r3, asl #2
+	sub	r1, fp, #20
+	add	r3, r1, r3
+	add	r3, r3, r2
+	ldr	r1, [r3, #0]
 	ldr	r0, .L63+16
 	mov	r3, ip
 	mov	r3, r3, asl #6
@@ -892,9 +895,9 @@ main:
 	cmp	r3, #7
 	ble	.L61
 	mov	r3, #0
-	str	r3, [fp, #-328]
+	str	r3, [fp, #-592]
 .L41:
-	ldr	r3, [fp, #-328]
+	ldr	r3, [fp, #-592]
 	mov	r0, r3
 	sub	sp, fp, #16
 	ldmfd	sp!, {r4, r5, r6, fp, pc}
@@ -904,7 +907,7 @@ main:
 	.word	.LC4
 	.word	.LC5
 	.word	.LC6
-	.word	g_current_group
+	.word	-560
 	.word	g_output_matrix
 	.word	.LC7
 	.word	END_SCALE
@@ -913,6 +916,5 @@ main:
 	.size	main, .-main
 	.comm	g_pixel_matrix,307200,4
 	.comm	g_output_matrix,307200,4
-	.comm	g_current_group,256,4
 	.ident	"GCC: (Sourcery G++ Lite 2008q3-72) 4.3.2"
 	.section	.note.GNU-stack,"",%progbits

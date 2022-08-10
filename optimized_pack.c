@@ -15,7 +15,7 @@ More specific examples given as they appear and are assumed to be used throughou
 // Image related constants
 int const IMAGE_SIZE = 240*320;
 int const IMAGE_HEIGHT = 240;
-int const IMAGE_WIDTH = 320;
+int const IMAGE_WIDTH = 80;
 
 // Constants used in Loeffler's Algorithm
 int const SQRT2 = 181;
@@ -25,16 +25,15 @@ int const ROTATE_CONST[3] = {16069, 13622, 8866};                   // Constants
 int const END_SCALE = 1024;                                        // Ending scale factor
 
 // Barr-C: Global variables should start with "g_" (7.1.j)
-int32_t g_pixel_matrix[240][320];
+int32_t g_pixel_matrix[240][80];
 int32_t g_output_matrix[240][320];
-int32_t g_current_group[8][8];
 
 void get_image(char *p_image_name) 
 {
     // Barr-C: Pointers should start with "p_" (7.1.k)
     // Barr-C: variables initialized before use (7.2.a)
     FILE *p_image_file;
-    int cbinary;
+    int cbinary[1];
     int error;
 
     fflush(stdout);
@@ -67,15 +66,15 @@ void get_image(char *p_image_name)
     {
         for (int j = 0; j < IMAGE_WIDTH; j++) 
         {
-            cbinary = fgetc(p_image_file);
+            error = fread(cbinary, 4, 1, p_image_file);
 
-            if (cbinary  == EOF)
+            if (error < 1)
             {
                 break;
             }
             else
             {
-                g_pixel_matrix[i][j] = cbinary;
+                g_pixel_matrix[i][j] = cbinary[0];
             }
         }
     }
@@ -93,14 +92,26 @@ void transpose(int32_t orig[][8], int32_t trans[][8])
     }
 }
 
-void get_next_group(int current_x, int current_y) 
+void get_next_group(int current_x, int current_y, int32_t p_current_group[][8]) 
 {
+    uint32_t masks[4] = { 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000 };
+    uint32_t cur_value;
+
     for (int i = 0; i < 8; i++) 
-    {
-        for (int j = 0; j < 8; j++) 
-        {
-            g_current_group[i][j] = g_pixel_matrix[current_y + i][current_x + j];
-        }
+    {   
+        cur_value = g_pixel_matrix[current_y + i][current_x];
+        
+        p_current_group[i][0] = cur_value & masks[0];
+        p_current_group[i][1] = (cur_value & masks[1]) >> 8;
+        p_current_group[i][2] = (cur_value & masks[2]) >> 16;
+        p_current_group[i][3] = (cur_value & masks[3]) >> 24;
+
+        cur_value = g_pixel_matrix[current_y + i][current_x + 1];
+
+        p_current_group[i][4] = cur_value & masks[0];
+        p_current_group[i][5] = (cur_value & masks[1]) >> 8;
+        p_current_group[i][6] = (cur_value & masks[2]) >> 16;
+        p_current_group[i][7] = (cur_value & masks[3]) >> 24;
     }
 }
 
@@ -129,6 +140,7 @@ int32_t scale_up(int32_t input)
 void loefflers(int32_t * x)
 {
     int32_t tmp_output[8];
+    int32_t tmp_output2[8];
     
     //stage 1
     reflector(x[0], x[7], &tmp_output[0], &tmp_output[7]);
@@ -136,38 +148,48 @@ void loefflers(int32_t * x)
     reflector(x[2], x[5], &tmp_output[2], &tmp_output[5]);
     reflector(x[3], x[4], &tmp_output[3], &tmp_output[4]);
     
+    // Even Numbers
     //stage 2
-    reflector(tmp_output[0], tmp_output[3], &tmp_output[0], &tmp_output[3]);
-    reflector(tmp_output[1], tmp_output[2], &tmp_output[1], &tmp_output[2]);
-    
-    rotator(tmp_output[4], tmp_output[7], 1, &tmp_output[4], &tmp_output[7]);
-    rotator(tmp_output[5], tmp_output[6], 0, &tmp_output[5], &tmp_output[6]);
-    
-    //stage 3
-    reflector(tmp_output[0], tmp_output[1], &tmp_output[0], &tmp_output[1]);
-    rotator(tmp_output[2], tmp_output[3], 2, &tmp_output[2], &tmp_output[3]);
-    reflector(tmp_output[4], tmp_output[6], &tmp_output[4], &tmp_output[6]);
-    reflector(tmp_output[7], tmp_output[5], &tmp_output[7], &tmp_output[5]);
-    
-    //stage 4
-    reflector(tmp_output[7], tmp_output[4], &tmp_output[7], &tmp_output[4]);
-    tmp_output[5] = scale_up(tmp_output[5]);
-    tmp_output[6] = scale_up(tmp_output[6]);  
+    reflector(tmp_output[0], tmp_output[3], &tmp_output2[0], &tmp_output2[3]);
+    reflector(tmp_output[1], tmp_output[2], &tmp_output2[1], &tmp_output2[2]);
+
+    // stage 3
+    reflector(tmp_output2[0], tmp_output2[1], &tmp_output[0], &tmp_output[1]);
+    rotator(tmp_output2[2], tmp_output2[3], 2, &tmp_output[2], &tmp_output[3]);
     
     // unscramble values
     x[0] = tmp_output[0] << 5;
     x[4] = tmp_output[1] << 5;
     x[2] = tmp_output[2] >> 9;
     x[6] = tmp_output[3] >> 9;
-    x[7] = tmp_output[4] >> 9;
-    x[3] = tmp_output[5] >> 9;
-    x[5] = tmp_output[6] >> 9;
-    x[1] = tmp_output[7] >> 9;
+
+    //Odd Numbers
+    // stage 2
+    rotator(tmp_output[4], tmp_output[7], 1, &tmp_output2[4], &tmp_output2[7]);
+    rotator(tmp_output[5], tmp_output[6], 0, &tmp_output2[5], &tmp_output2[6]);
+    
+    //stage 3
+    reflector(tmp_output2[4], tmp_output2[6], &tmp_output[4], &tmp_output[6]);
+    reflector(tmp_output2[7], tmp_output2[5], &tmp_output[7], &tmp_output[5]);
+    
+    //stage 4
+    reflector(tmp_output[7], tmp_output[4], &tmp_output2[7], &tmp_output2[4]);
+    tmp_output2[5] = scale_up(tmp_output[5]);
+    tmp_output2[6] = scale_up(tmp_output[6]);  
+    
+    // unscramble values
+    x[7] = tmp_output2[4] >> 9;
+    x[3] = tmp_output2[5] >> 9;
+    x[5] = tmp_output2[6] >> 9;
+    x[1] = tmp_output2[7] >> 9;
 }
 
 int main(int argc, char *argv[])
 {
+    int32_t current_group[8][8];
     int32_t current_group_trans[8][8];
+    int pos_y;
+    int pos_x;
     
     if (argc != 2)
     {
@@ -185,27 +207,30 @@ int main(int argc, char *argv[])
     {
         for (int x = 0; x < 40; x++)
         {
-            get_next_group(8*x, 8*y);
+            pos_x = x << 1;
+            pos_y = y << 3;
+
+            get_next_group(pos_x, pos_y, current_group);
             
             for (int i = 0; i < 8; i++)
             {
-                loefflers(g_current_group[i]);
+                loefflers(current_group[i]);
             }	
             
-            transpose(g_current_group, current_group_trans);
+            transpose(current_group, current_group_trans);
             
             for (int i = 0; i < 8; i++)
             {
                 loefflers(current_group_trans[i]);
             }
-            
-            transpose(current_group_trans, g_current_group);
+
+            pos_x = x << 3;
 
             for (int i = 0; i < 8; i++) 
             {
                 for (int j = 0; j < 8; j++) 
                 {
-                    g_output_matrix[y*8 + i][x*8 + j] = g_current_group[i][j];
+                    g_output_matrix[pos_y + i][pos_x + j] = current_group_trans[j][i];
                 }
             }
         }
