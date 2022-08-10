@@ -1,0 +1,208 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls   s/call   s/call  name    
+ 51.86     28.23    28.23                             mcount_internal
+ 18.57     38.34    10.11                             __gnu_mcount_nc
+ 14.16     46.05     7.71  9600000     0.00     0.00  loefflers
+  6.17     49.41     3.36 96000000     0.00     0.00  reflector
+  3.14     51.12     1.71  2400000     0.00     0.00  transpose
+  2.13     52.28     1.16 28800000     0.00     0.00  rotator
+  1.89     53.31     1.03        1     1.03    16.02  main
+  1.41     54.08     0.77 19200000     0.00     0.00  scale_up
+  0.50     54.35     0.27  1200000     0.00     0.00  get_next_group
+  0.09     54.40     0.05                             getc
+  0.02     54.41     0.01        1     0.01     0.01  get_image
+  0.02     54.42     0.01                             ___printf_fp
+  0.02     54.43     0.01                             __aeabi_read_tp
+  0.02     54.44     0.01                             cfree
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012-2016 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 4 byte(s) for 0.02% of 54.44 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]     51.9   28.23    0.00                 mcount_internal [1]
+-----------------------------------------------
+                1.03   14.99       1/1           __libc_start_main [3]
+[2]     29.4    1.03   14.99       1         main [2]
+                7.71    5.29 9600000/9600000     loefflers [4]
+                1.71    0.00 2400000/2400000     transpose [7]
+                0.27    0.00 1200000/1200000     get_next_group [10]
+                0.01    0.00       1/1           get_image [12]
+-----------------------------------------------
+                                                 <spontaneous>
+[3]     29.4    0.00   16.02                 __libc_start_main [3]
+                1.03   14.99       1/1           main [2]
+-----------------------------------------------
+                7.71    5.29 9600000/9600000     main [2]
+[4]     23.9    7.71    5.29 9600000         loefflers [4]
+                3.36    0.00 96000000/96000000     reflector [6]
+                1.16    0.00 28800000/28800000     rotator [8]
+                0.77    0.00 19200000/19200000     scale_up [9]
+-----------------------------------------------
+                                                 <spontaneous>
+[5]     18.6   10.11    0.00                 __gnu_mcount_nc [5]
+-----------------------------------------------
+                3.36    0.00 96000000/96000000     loefflers [4]
+[6]      6.2    3.36    0.00 96000000         reflector [6]
+-----------------------------------------------
+                1.71    0.00 2400000/2400000     main [2]
+[7]      3.1    1.71    0.00 2400000         transpose [7]
+-----------------------------------------------
+                1.16    0.00 28800000/28800000     loefflers [4]
+[8]      2.1    1.16    0.00 28800000         rotator [8]
+-----------------------------------------------
+                0.77    0.00 19200000/19200000     loefflers [4]
+[9]      1.4    0.77    0.00 19200000         scale_up [9]
+-----------------------------------------------
+                0.27    0.00 1200000/1200000     main [2]
+[10]     0.5    0.27    0.00 1200000         get_next_group [10]
+-----------------------------------------------
+                                                 <spontaneous>
+[11]     0.1    0.05    0.00                 getc [11]
+-----------------------------------------------
+                0.01    0.00       1/1           main [2]
+[12]     0.0    0.01    0.00       1         get_image [12]
+-----------------------------------------------
+                                                 <spontaneous>
+[13]     0.0    0.01    0.00                 cfree [13]
+-----------------------------------------------
+                                                 <spontaneous>
+[14]     0.0    0.01    0.00                 ___printf_fp [14]
+-----------------------------------------------
+                                                 <spontaneous>
+[15]     0.0    0.01    0.00                 __aeabi_read_tp [15]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012-2016 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+  [14] ___printf_fp           [10] get_next_group          [6] reflector
+  [15] __aeabi_read_tp        [11] getc                    [8] rotator
+   [5] __gnu_mcount_nc         [4] loefflers               [9] scale_up
+  [13] cfree                   [2] main                    [7] transpose
+  [12] get_image               [1] mcount_internal
