@@ -89,15 +89,17 @@ void transpose(int32x2_t orig[4][8], int32x2_t trans[4][8])
 {
     int32_t temp_trans[8][8];
     int32_t temp_orig[4][8][2];
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < 8; ++i)
     {
 		
-		for(int k = 0; k < 8; ++k){
+		for(int k = 0; k < 8; ++k)
+		{
 			vst1_s32(temp_orig[i>>1][k], orig[i>>1][k]);
 		}
 	}
-    for(int i = 0; i < 8; i++){
-        for (int j = 0; j < 8; j++) 
+    for(int i = 0; i < 8; ++i)
+	{
+        for (int j = 0; j < 8; ++j) 
         {
         	temp_trans[i][j] = temp_orig[j>>1][i][j%2];
         }
@@ -106,9 +108,9 @@ void transpose(int32x2_t orig[4][8], int32x2_t trans[4][8])
 	for (int i = 0; i < 8; i+=2) 
     {
 		int32_t pix_group[2];
-		for (int j = 0; j < 8; ++j){
-        	
-			pix_group[0] = temp_trans[i][j];
+		for (int j = 0; j < 8; ++j)
+		{
+        	pix_group[0] = temp_trans[i][j];
 			pix_group[1] = temp_trans[i+1][j];
 			trans[i>>1][j] = vld1_s32(pix_group);
 		}
@@ -119,15 +121,13 @@ void get_next_group(int current_x, int current_y)
 {
     for (int i = 0; i < 8; i+=2) 
     {
-		for (int j = 0; j < 8; ++j){
-        		int32_t pix_group[2];
+		for (int j = 0; j < 8; ++j)
+		{
+        	int32_t pix_group[2];
 			pix_group[0] = g_pixel_matrix[current_y + i][current_x + j];
 			pix_group[1] = g_pixel_matrix[current_y + i+1][current_x + j];
 			
 			g_current_group[i>>1][j] = vld1_s32(pix_group);
-			//int32_t temp[2];
-			//vst1_s32(temp, g_current_group[i>>1][j]);
-			//printf("%d ", temp[0]);
 		}
     }
 }
@@ -224,47 +224,9 @@ int main(int argc, char *argv[])
     printf("Filename: %s\n", argv[1]);
 
     printf("\n----TESTING AREA----\n");
+	
     get_image(argv[1]);
-    /*
-    get_next_group(160, 120);
-    
-    transpose(g_current_group, current_group_trans);
-    
-    int32_t temp_output[4][8][2];
-    for (int i = 0; i < 8; i+=2)
-    {
-		printf("i: %d\n", i>>1);
-                for(int k = 0; k < 8; k++){
-			//printf("%d", temp_output);
-                        vst1_s32(temp_output[i>>1][k], current_group_trans[i>>1][k]);
-                }
-		//printf("temp output 0: %d ", temp_output[0][0]);
-                for (int j = 0; j < 8; ++j)
-                {
-                	g_output_matrix[i][j] = temp_output[i>>1][j][0];
-                        g_output_matrix[i + 1][j] = temp_output[i>>1][j][1];
-                }
-    }
-    for(int i = 0; i < 8; i++){
-	for(int j = 0; j < 8; j++){
-		printf("%d, ", g_output_matrix[i][j]);
-	}
-	printf("\n");
-    }
-    
-    int32x2_t testIn1 = {1, 2};
-    int32x2_t testIn2 = {2, 1};
-    int32x2_t testOut1;
-    int32x2_t  testOut2;
 
-    rotator(testIn1, testIn2, 0, &testOut1, &testOut2);
-    int32_t testOutPrint1[2];
-    int32_t testOutPrint2[2];
-    vst1_s32(testOutPrint1, testOut1);
-    vst1_s32(testOutPrint2, testOut2);
-    printf("%f \n", (double)testOutPrint1[0]/16384);
-    printf("%f \n", (double)testOutPrint2[0]/16384);
-    */
     for (int y = 0; y < 30; ++y)
     {
         for (int x = 0; x < 40; ++x)
