@@ -218,9 +218,9 @@ int main(int argc, char *argv[])
 
     get_image(argv[1]);
     
-    for (int x = 0; x < 30; ++x)
+    for (int y = 0; y < 30; ++y)
     {
-        for (int y = 0; y < 40; ++y)
+        for (int x = 0; x < 40; ++x)
         {
 			pos_x = x << 3;
             pos_y = y << 3;
@@ -247,7 +247,7 @@ int main(int argc, char *argv[])
 				vst4_s32(temp_output, g_current_group[i]);
 				for (int j = 0; j < 8; ++j) 
 				{
-            		g_output_matrix[x*8 + i][y*8 + j] = temp_output[j>>1][j%2];
+            		g_output_matrix[pos_y + i][pos_x + j] = temp_output[j>>1][j%2];
         		}
     		}
     	}
