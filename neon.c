@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdint.h>
 #include <arm_neon.h>
 
