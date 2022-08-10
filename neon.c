@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <float.h>
 #include <stdint.h>
 #include <arm_neon.h>
 
