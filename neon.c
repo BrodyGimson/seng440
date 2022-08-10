@@ -152,6 +152,7 @@ void rotator(int32x2_t input_1, int32x2_t input_2, int c, int32x2_t *p_output_1,
     int32x2_t p_output_2_add_1 = vadd_s32(input_1, input_2);
     int32x2_t p_output_2_mul_2 = vmul_n_s32(p_output_2_add_1, ROTATE_CONST[c]);
     p_output_2[0] = vadd_s32(p_output_2_mul_1, p_output_2_mul_2);
+    
 }
 
 int32x2_t scale_up(int32x2_t input)
@@ -224,6 +225,7 @@ int main(int argc, char *argv[])
 
     printf("\n----TESTING AREA----\n");
     get_image(argv[1]);
+    /*
     get_next_group(160, 120);
     
     transpose(g_current_group, current_group_trans);
@@ -262,7 +264,7 @@ int main(int argc, char *argv[])
     vst1_s32(testOutPrint2, testOut2);
     printf("%f \n", (double)testOutPrint1[0]/16384);
     printf("%f \n", (double)testOutPrint2[0]/16384);
-    
+    */
     for (int y = 0; y < 30; ++y)
     {
         for (int x = 0; x < 40; ++x)
