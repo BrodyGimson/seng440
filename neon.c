@@ -2,6 +2,7 @@
 #include <string.h>
 #include <float.h>
 #include <stdint.h>
+#include <arm_neon.h>
 
 /*
 General Barr-C things that were followed included 
@@ -23,13 +24,13 @@ int const IMAGE_WIDTH = 320;
 int const SQRT2 = 181;
 int const ROTATE_CONST_p_output_1[3] = {-12873, -4520, 12539};      // Constants used for output 1 in rotators
 int const ROTATE_CONST_p_output_2[3] = {-19266, -22725, -30273};    // Constants used for output 2 in rotators
-int const ROTATE_CONST[3] = {16069, 13622, 8866};                   // Constants used for both in rotators
-int const END_SCALE = 16384;                                        // Ending scale factor
+int const END_SCALE = 1024;                                        // Ending scale factor
+
 
 // Barr-C: Global variables should start with "g_" (7.1.j)
 int32_t g_pixel_matrix[240][320];
 int32_t g_output_matrix[240][320];
-int32_t g_current_group[8][8];
+int32x2x4_t g_current_group[8];
 
 void get_image(char *p_image_name) 
 {
@@ -65,9 +66,9 @@ void get_image(char *p_image_name)
         perror("Error: Could not seek past colour table of file");
     }
     
-    for (int i = 0; i < IMAGE_HEIGHT; i++) 
+    for (int i = 0; i < IMAGE_HEIGHT; ++i) 
     {
-        for (int j = 0; j < IMAGE_WIDTH; j++) 
+        for (int j = 0; j < IMAGE_WIDTH; ++j) 
         {
             cbinary = fgetc(p_image_file);
 
@@ -81,27 +82,48 @@ void get_image(char *p_image_name)
             }
         }
     }
+	fclose(p_image_file);
 }
 
-void transpose(int32_t orig[][8], int32_t trans[][8])
+void transpose(int32x2x4_t orig[8], int32x2x4_t trans[8])
 {
-    for (int i = 0; i < 8; i++)
+    int32_t temp_trans[8][4][2];
+    int32_t temp_orig[8][4][2];
+    for (int i = 0; i < 8; ++i){
+		vst4_s32(temp_orig[i], orig[i]);
+    }
+
+    for (int i = 0; i < 8; ++i)
     {
-        for (int j = 0; j < 8; j++) 
+		for (int j = 0; j < 8; ++j) 
         {
-            trans[i][j] = orig[j][i];
+            temp_trans[j][i>>1][i%2] = temp_orig[i][j>>1][j%2];
         }
+    }
+
+    //Required to ensure temp_trans is properly stored to the neon var
+    for (int i = 0; i < 8; ++i)
+    {
+		trans[i] = vld4_s32(temp_trans[i]);
     }
 }
 
 void get_next_group(int current_x, int current_y) 
 {
-    for (int i = 0; i < 8; i++) 
+    int32_t temp_group[4][2];
+    for (int i = 0; i < 8; ++i) 
     {
-        for (int j = 0; j < 8; j++) 
-        {
-            g_current_group[i][j] = g_pixel_matrix[current_y + i][current_x + j];
-        }
+		for (int j = 0; j < 8; j += 2){
+        	int32_t pix_group[2];
+			pix_group[0] = g_pixel_matrix[current_y + i][current_x + j];
+			pix_group[1] = g_pixel_matrix[current_y + i][current_x + j+1];
+		
+			temp_group[j>>1][0] = pix_group[0];
+			temp_group[j>>1][1] = pix_group[1];
+		}
+		g_current_group[i] = vld4_s32(temp_group);
+		int32_t test[4][2];
+		vst4_s32(test, g_current_group[i]);
     }
 }
 
@@ -113,6 +135,7 @@ void * reflector(int32_t input_1, int32_t input_2, int32_t *p_output_1, int32_t 
 
 void rotator(int32_t input_1, int32_t input_2, int c, int32_t *p_output_1, int32_t *p_output_2)
 {
+	int ROTATE_CONST[3] = {16069, 13622, 8866}; 	// Constant used for both in rotators
     // Barr-C: Don't rely on C's operation precedence rules, use parentheses (1.4.a)
     p_output_1[0] = (ROTATE_CONST_p_output_1[c] * input_2) + (ROTATE_CONST[c] * (input_1 + input_2));
     p_output_2[0] = (ROTATE_CONST_p_output_2[c] * input_1) + (ROTATE_CONST[c] * (input_1 + input_2));
@@ -121,32 +144,44 @@ void rotator(int32_t input_1, int32_t input_2, int c, int32_t *p_output_1, int32
 int32_t scale_up(int32_t input)
 {
     int32_t output;
-
-    input = input >> 7;
+	
+	input = input >> 7;
     output = SQRT2 * input;
     return output;
 }
 
-void * loefflers(int32_t * x)
+int32x2x4_t loefflers(int32x2x4_t neon_x)
 {
     int32_t tmp_output[8];
-    
+    int32_t x[4][2];
+    vst4_s32(x, neon_x);
     //stage 1
-    reflector(x[0], x[7], &tmp_output[0], &tmp_output[7]);
-    reflector(x[1], x[6], &tmp_output[1], &tmp_output[6]);
-    reflector(x[2], x[5], &tmp_output[2], &tmp_output[5]);
-    reflector(x[3], x[4], &tmp_output[3], &tmp_output[4]);
+    reflector(x[0][0], x[3][1], &tmp_output[0], &tmp_output[7]);
+    reflector(x[0][1], x[3][0], &tmp_output[1], &tmp_output[6]);
+    reflector(x[1][0], x[2][1], &tmp_output[2], &tmp_output[5]);
+    reflector(x[1][1], x[2][0], &tmp_output[3], &tmp_output[4]);
     
+	//Even Numbers
     //stage 2
     reflector(tmp_output[0], tmp_output[3], &tmp_output[0], &tmp_output[3]);
     reflector(tmp_output[1], tmp_output[2], &tmp_output[1], &tmp_output[2]);
-    
+	
+	//stage 3
+    reflector(tmp_output[0], tmp_output[1], &tmp_output[0], &tmp_output[1]);
+    rotator(tmp_output[2], tmp_output[3], 2, &tmp_output[2], &tmp_output[3]);
+	
+	// unscramble values
+    x[0][0] = tmp_output[0] << 5;
+    x[2][0] = tmp_output[1] << 5;
+    x[1][0] = tmp_output[2] >> 9;
+    x[3][0] = tmp_output[3] >> 9;
+	
+    //Odd Numbers
+	//stage 2
     rotator(tmp_output[4], tmp_output[7], 1, &tmp_output[4], &tmp_output[7]);
     rotator(tmp_output[5], tmp_output[6], 0, &tmp_output[5], &tmp_output[6]);
     
-    //stage 3
-    reflector(tmp_output[0], tmp_output[1], &tmp_output[0], &tmp_output[1]);
-    rotator(tmp_output[2], tmp_output[3], 2, &tmp_output[2], &tmp_output[3]);
+	//stage 3
     reflector(tmp_output[4], tmp_output[6], &tmp_output[4], &tmp_output[6]);
     reflector(tmp_output[7], tmp_output[5], &tmp_output[7], &tmp_output[5]);
     
@@ -155,21 +190,22 @@ void * loefflers(int32_t * x)
     tmp_output[5] = scale_up(tmp_output[5]);
     tmp_output[6] = scale_up(tmp_output[6]);  
     
-    // unscramble values
-    x[0] = tmp_output[0] << 7;
-    x[4] = tmp_output[1] << 7;
-    x[2] = tmp_output[2] >> 7;
-    x[6] = tmp_output[3] >> 7;
-    x[7] = tmp_output[4] >> 7;
-    x[3] = tmp_output[5] >> 7;
-    x[5] = tmp_output[6] >> 7;
-    x[1] = tmp_output[7] >> 7;
+	// unscramble values
+    x[3][1] = tmp_output[4] >> 9;
+    x[1][1] = tmp_output[5] >> 9;
+    x[2][1] = tmp_output[6] >> 9;
+    x[0][1] = tmp_output[7] >> 9;
+	
+    neon_x = vld4_s32(x);
+    return neon_x;
 }
 
 int main(int argc, char *argv[])
 {
-    int32_t current_group_trans[8][8];
-    
+    int32x2x4_t current_group_trans[8];
+    int pos_x;
+    int pos_y;
+
     if (argc != 2)
     {
         printf("Error: 1 arg expected {filename}, received: %d\n", (argc - 1));
@@ -181,41 +217,46 @@ int main(int argc, char *argv[])
     printf("\n----TESTING AREA----\n");
 
     get_image(argv[1]);
-
-    for (int x = 0; x < 40; x++)
+    
+    for (int x = 0; x < 30; ++x)
     {
-        for (int y = 0; y < 30; y++)
+        for (int y = 0; y < 40; ++y)
         {
-    		get_next_group(8*x, 8*y);
+			pos_x = x << 3;
+            pos_y = y << 3;
+			
+    		get_next_group(pos_x, pos_y);
     		
-    		for (int i = 0; i < 8; i++)
+    		for (int i = 0; i < 8; ++i)
             {
-    			loefflers(g_current_group[i]);
+    			g_current_group[i] = loefflers(g_current_group[i]);
     		}	
     		
     		transpose(g_current_group, current_group_trans);
     		
-    		for (int i = 0; i < 8; i++)
+    		for (int i = 0; i < 8; ++i)
             {
-    			loefflers(current_group_trans[i]);
+    			current_group_trans[i] = loefflers(current_group_trans[i]);
     		}
     		
     		transpose(current_group_trans, g_current_group);
 
-    		for (int i = 0; i < 8; i++) 
+    		for (int i = 0; i < 8; ++i) 
             {
-        		for (int j = 0; j < 8; j++) 
-                {
-            		g_output_matrix[x*8 + i][y*8 + j] = g_current_group[i][j];
+        		int32_t temp_output[4][2];
+				vst4_s32(temp_output, g_current_group[i]);
+				for (int j = 0; j < 8; ++j) 
+				{
+            		g_output_matrix[x*8 + i][y*8 + j] = temp_output[j>>1][j%2];
         		}
     		}
     	}
     }
 
     printf("\nCorner 8x8:\n");
-    for (int i = 0; i < 8; i++) 
+    for (int i = 0; i < 8; ++i) 
     {
-        for (int j = 0; j < 8; j++) 
+        for (int j = 0; j < 8; ++j) 
         {
             printf("%f, ", (double) g_output_matrix[i][j] / END_SCALE);
         }
@@ -223,9 +264,9 @@ int main(int argc, char *argv[])
     }
 
     printf("\nCenter 8x8:\n");
-    for (int i = 0; i < 8; i++) 
+    for (int i = 0; i < 8; ++i) 
     {
-        for (int j = 0; j < 8; j++) 
+        for (int j = 0; j < 8; ++j) 
         {
             printf("%f, ", (double) g_output_matrix[i + 120][j + 160] / END_SCALE);
         }
