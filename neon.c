@@ -24,7 +24,7 @@ int const IMAGE_WIDTH = 320;
 int const SQRT2 = 181;
 int const ROTATE_CONST_p_output_1[3] = {-12873, -4520, 12539};      // Constants used for output 1 in rotators
 int const ROTATE_CONST_p_output_2[3] = {-19266, -22725, -30273};    // Constants used for output 2 in rotators
-int const END_SCALE = 16384;                                        // Ending scale factor
+int const END_SCALE = 1024;                                        // Ending scale factor
 
 // Barr-C: Global variables should start with "g_" (7.1.j)
 int32_t g_pixel_matrix[240][320];
@@ -144,7 +144,7 @@ int32_t scale_up(int32_t input)
 {
     int32_t output;
 	
-	input = input >> 7
+	input = input >> 7;
     output = SQRT2 * input;
     return output;
 }
@@ -202,7 +202,9 @@ int32x2x4_t loefflers(int32x2x4_t neon_x)
 int main(int argc, char *argv[])
 {
     int32x2x4_t current_group_trans[8];
-    
+    int pos_x;
+    int pos_y;
+
     if (argc != 2)
     {
         printf("Error: 1 arg expected {filename}, received: %d\n", (argc - 1));
