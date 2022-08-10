@@ -181,31 +181,35 @@ int main(int argc, char *argv[])
 
     get_image(argv[1]);
 
-    for (int y = 0; y < 30; y++)
+    for (int c = 0; c < 1000; c++)
     {
-        for (int x = 0; x < 40; x++)
-        {
-            get_next_group(8*x, 8*y);
-            
-            for (int i = 0; i < 8; i++)
-            {
-                loefflers(g_current_group[i]);
-            }	
-            
-            transpose(g_current_group, current_group_trans);
-            
-            for (int i = 0; i < 8; i++)
-            {
-                loefflers(current_group_trans[i]);
-            }
-            
-            transpose(current_group_trans, g_current_group);
 
-            for (int i = 0; i < 8; i++) 
+        for (int y = 0; y < 30; y++)
+        {
+            for (int x = 0; x < 40; x++)
             {
-                for (int j = 0; j < 8; j++) 
+                get_next_group(8*x, 8*y);
+                
+                for (int i = 0; i < 8; i++)
                 {
-                    g_output_matrix[y*8 + i][x*8 + j] = g_current_group[i][j];
+                    loefflers(g_current_group[i]);
+                }	
+                
+                transpose(g_current_group, current_group_trans);
+                
+                for (int i = 0; i < 8; i++)
+                {
+                    loefflers(current_group_trans[i]);
+                }
+                
+                transpose(current_group_trans, g_current_group);
+
+                for (int i = 0; i < 8; i++) 
+                {
+                    for (int j = 0; j < 8; j++) 
+                    {
+                        g_output_matrix[y*8 + i][x*8 + j] = g_current_group[i][j];
+                    }
                 }
             }
         }

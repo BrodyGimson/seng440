@@ -201,36 +201,40 @@ int main(int argc, char *argv[])
 
     printf("\n----TESTING AREA----\n");
 
+    
     get_image(argv[1]);
 
-    for (int y = 0; y < 30; y++)
+    for (int c = 0; c < 1000; c++) 
     {
-        for (int x = 0; x < 40; x++)
+        for (int y = 0; y < 30; y++)
         {
-            pos_x = x << 1;
-            pos_y = y << 3;
-
-            get_next_group(pos_x, pos_y, current_group);
-            
-            for (int i = 0; i < 8; i++)
+            for (int x = 0; x < 40; x++)
             {
-                loefflers(current_group[i]);
-            }	
-            
-            transpose(current_group, current_group_trans);
-            
-            for (int i = 0; i < 8; i++)
-            {
-                loefflers(current_group_trans[i]);
-            }
+                pos_x = x << 1;
+                pos_y = y << 3;
 
-            pos_x = x << 3;
-
-            for (int i = 0; i < 8; i++) 
-            {
-                for (int j = 0; j < 8; j++) 
+                get_next_group(pos_x, pos_y, current_group);
+                
+                for (int i = 0; i < 8; i++)
                 {
-                    g_output_matrix[pos_y + i][pos_x + j] = current_group_trans[j][i];
+                    loefflers(current_group[i]);
+                }	
+                
+                transpose(current_group, current_group_trans);
+                
+                for (int i = 0; i < 8; i++)
+                {
+                    loefflers(current_group_trans[i]);
+                }
+
+                pos_x = x << 3;
+
+                for (int i = 0; i < 8; i++) 
+                {
+                    for (int j = 0; j < 8; j++) 
+                    {
+                        g_output_matrix[pos_y + i][pos_x + j] = current_group_trans[j][i];
+                    }
                 }
             }
         }

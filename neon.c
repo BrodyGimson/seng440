@@ -227,42 +227,44 @@ int main(int argc, char *argv[])
 	
     get_image(argv[1]);
 
-    for (int y = 0; y < 30; ++y)
-    {
-        for (int x = 0; x < 40; ++x)
+    for (int c = 0; c < 1000; c++) {
+        for (int y = 0; y < 30; ++y)
         {
-			pos_x = x << 3;
-            pos_y = y << 3;
-			
-    		get_next_group(pos_x, pos_y);
-    		
-    		for (int i = 0; i < 4; ++i)
+            for (int x = 0; x < 40; ++x)
             {
-    			loefflers(g_current_group[i]);
-    		}	
-    		
-    		transpose(g_current_group, current_group_trans);
-    		
-    		for (int i = 0; i < 4; ++i)
-            {
-    			loefflers(current_group_trans[i]);
-    		}
-    		
-    		transpose(current_group_trans, g_current_group);
+                pos_x = x << 3;
+                pos_y = y << 3;
+                
+                get_next_group(pos_x, pos_y);
+                
+                for (int i = 0; i < 4; ++i)
+                {
+                    loefflers(g_current_group[i]);
+                }	
+                
+                transpose(g_current_group, current_group_trans);
+                
+                for (int i = 0; i < 4; ++i)
+                {
+                    loefflers(current_group_trans[i]);
+                }
+                
+                transpose(current_group_trans, g_current_group);
 
-    		for (int i = 0; i < 8; i+=2) 
-            {
-        		int32_t temp_output[8][2];
-			for(int k = 0; k < 8; k++){
-					vst1_s32(temp_output[k], g_current_group[i>>1][k]);
-			}
-				for (int j = 0; j < 8; ++j) 
-				{
-            		g_output_matrix[pos_y + i][pos_x + j] = temp_output[j][0];
-					g_output_matrix[pos_y + i + 1][pos_x + j] = temp_output[j][1];
-        		}
-    		}
-    	}
+                for (int i = 0; i < 8; i+=2) 
+                {
+                    int32_t temp_output[8][2];
+                for(int k = 0; k < 8; k++){
+                        vst1_s32(temp_output[k], g_current_group[i>>1][k]);
+                }
+                    for (int j = 0; j < 8; ++j) 
+                    {
+                        g_output_matrix[pos_y + i][pos_x + j] = temp_output[j][0];
+                        g_output_matrix[pos_y + i + 1][pos_x + j] = temp_output[j][1];
+                    }
+                }
+            }
+        }
     }
 
     printf("\nCorner 8x8:\n");
