@@ -15,7 +15,7 @@ arm-none-linux-gnueabi-gcc -static -std=c99 -march=armv5 <name of implementation
 ```
 To run the compiled code use the following command:
 ```
-qemu ./<name of implementation> test_image.bmp
+qemu-arm <name of implementation> test_image.bmp
 ```
 
 ## Running the Performance Tests
@@ -32,7 +32,7 @@ arm-none-linux-gnueabi-gcc -static -std=c99 -march=armv5 <name of implementation
 The code then needs to be run in order to generate a profile of the code.
 To run the compiled code use the following command:
 ```
-qemu ./<name of implementation> test_image.bmp
+qemu-arm <name of implementation> test_image.bmp
 ```
 To then create a report use the following command:
 ```
@@ -48,6 +48,17 @@ arm-none-linux-gnueabi-gcc -static -std=c99 -march=armv5 <name of implementation
 - Without it:
 ```
 arm-none-linux-gnueabi-gcc -static -std=c99 -march=armv5 <name of implementation>.c -S
+```
+
+## Running and Generating the Assembly for the NEON Code
+The NEON code requires the QEMU-ARM simulator to run as it relies on NEON vector instructions for ARM. The command for compilation adds two new flags, otherwise to run it and do performance tests the rest is the same.
+For compiling the NEON code use the following command:
+```
+arm-none-linux-gnueabi-gcc -mfloat-abi=softfp -mfpu=neon -std=c99 -static -march=armv5 neon.c -o neon -O1
+```
+For running the NEON code use the following command:
+```
+qemu-arm neon test_image.bmp
 ```
 
 ## Running the Code without the Simulator
